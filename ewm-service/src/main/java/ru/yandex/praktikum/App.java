@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.yandex.praktikum;
 
 /**
  * Hello world!

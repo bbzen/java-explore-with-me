@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/db/ewmdb.mv.db
+/db/ewmdb.trace.db

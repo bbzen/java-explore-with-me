@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @Entity
-@Table(name = "stats", schema = "public")
+@Table(name = "hits", schema = "public")
 @NoArgsConstructor
-public class Stat {
+public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

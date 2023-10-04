@@ -18,6 +18,7 @@ public class StatService {
 
     public void create(StatInputDto statInputDto) {
         checkStatInputDto(statInputDto);
+
         statRepository.save(mapper.toStat(statInputDto));
     }
 

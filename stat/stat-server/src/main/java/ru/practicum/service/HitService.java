@@ -13,7 +13,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,17 +35,11 @@ public class HitService {
         LocalDateTime startLDT = LocalDateTime.parse(startDecoded, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         LocalDateTime endLDT = LocalDateTime.parse(endDecoded, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        List<ViewStatsDto> resultList = new ArrayList<>();
+        List<ViewStatsDto> resultList;
         if (unique) {
-
+            resultList = hitRepository.getListEndpointHitsDistinctIp(uris, startLDT, endLDT);
         } else {
-            for (String uri : uris) {
-                List<String> resultApps = hitRepository.getListApps(uri, startLDT, endLDT);
-                for (String resultApp : resultApps) {
-                    Integer hits = hitRepository.getUriCountByApp(resultApp, uri, startLDT, endLDT);
-                    resultList.add(new ViewStatsDto(resultApp, uri, hits));
-                }
-            }
+            resultList = hitRepository.getListEndpointHits(uris, startLDT, endLDT);
         }
         return resultList;
     }

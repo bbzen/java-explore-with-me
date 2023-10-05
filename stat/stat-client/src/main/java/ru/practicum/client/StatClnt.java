@@ -17,13 +17,13 @@ import ru.practicum.dto.EndpointHitDto;
 import java.util.Map;
 
 @Service
-public class StatClient {
+public class StatClnt {
     private static final String API_POST_PREFIX = "/hit";
     private static final String API_GET_PREFIX = "/stats";
     private final RestTemplate rest;
 
     @Autowired
-    public StatClient(@Value("${ewm-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatClnt(@Value("${ewm-server.url}") String serverUrl, RestTemplateBuilder builder) {
         this.rest = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
@@ -33,9 +33,11 @@ public class StatClient {
         return makeAndSendRequest(HttpMethod.POST, API_POST_PREFIX, null, dto);
     }
 
-    public ResponseEntity<Object> getStats(@Nullable Map<String, Object> parameters)
+    public ResponseEntity<Object> getStats(@Nullable Map<String, Object> parameters) {
+        return makeAndSendRequest(HttpMethod.GET, API_GET_PREFIX, parameters, null);
+    }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, T body) {
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body);
 
         ResponseEntity<Object> ewmServerResponse;

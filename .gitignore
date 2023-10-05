@@ -33,3 +33,4 @@ build/
 .vscode/
 /db/ewmdb.mv.db
 /db/ewmdb.trace.db
+/db/shareitdb.mv.db

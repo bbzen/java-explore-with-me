@@ -1,8 +1,8 @@
 version: '3.1'
 services:
   stats-server:
-    build: stat-server
-    image: stat-server_image
+    build: stat/stat-server
+    image: stat-server-image
     container_name: stat-server-cont
     ports:
       - "9090:9090"
@@ -13,7 +13,7 @@ services:
       - stats-db
     environment:
       - SPRING_DRIVER_CLASS_NAME=org.postgresql.Driver
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/statdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statdb
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=pass
 

@@ -34,7 +34,7 @@ public class StatClnt {
         log.debug("Client post method response is: " + response.getStatusCode());
     }
 
-    public ResponseEntity<Object> getStats(@Nullable Map<String, Object> parameters) {
+    public ResponseEntity<Object> getStats(Map<String, Object> parameters) {
         String getPrefix = "/stats?start={start}&end={end}&unique={unique}";
         if (parameters.containsKey("uris")) {
             getPrefix = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
@@ -44,7 +44,7 @@ public class StatClnt {
         return response;
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
 
         ResponseEntity<Object> ewmServerResponse;

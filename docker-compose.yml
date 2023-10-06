@@ -1,13 +1,38 @@
 version: '3.1'
 services:
   stats-server:
+    build: stat-server
+    image: stat-server_image
+    container_name: stat-server-cont
     ports:
       - "9090:9090"
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/statdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=pass
 
   stats-db:
     image: postgres:14-alpine
+    container_name: stat-db-cont
+    ports:
+      - "6542:5432"
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      - POSTGRES_DB=statdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
 
   ewm-service:
+    build: ewm-service
+    image: ewm-service_image
     ports:
       - "8080:8080"
 

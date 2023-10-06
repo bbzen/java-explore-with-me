@@ -1,5 +1,6 @@
 package ru.practicum.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -15,6 +16,7 @@ import ru.practicum.dto.EndpointHitDto;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class StatClnt {
     private static final String API_POST_PREFIX = "/hit";
@@ -28,15 +30,18 @@ public class StatClnt {
     }
 
     public void postHit(EndpointHitDto dto) {
-        makeAndSendRequest(HttpMethod.POST, API_POST_PREFIX, null, dto);
+        ResponseEntity<Object> response =  makeAndSendRequest(HttpMethod.POST, API_POST_PREFIX, null, dto);
+        log.debug("Client post method response is: " + response.getStatusCode());
     }
 
     public ResponseEntity<Object> getStats(@Nullable Map<String, Object> parameters) {
         String getPrefix = "/stats?start={start}&end={end}&unique={unique}";
-        if (parameters.get("uris") != null) {
-            getPrefix = "/stats?start={start}&end={end}&uris={uri}&unique={unique}";
+        if (parameters.containsKey("uris")) {
+            getPrefix = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
         }
-        return makeAndSendRequest(HttpMethod.GET, getPrefix, parameters, null);
+        ResponseEntity<Object> response = makeAndSendRequest(HttpMethod.GET, getPrefix, parameters, null);
+        log.debug("Client post method response is: " + response.getStatusCode());
+        return response;
     }
 
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {

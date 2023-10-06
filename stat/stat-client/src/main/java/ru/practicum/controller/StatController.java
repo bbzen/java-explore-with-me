@@ -26,7 +26,9 @@ public class StatController {
         Map<String, Object> params = new HashMap<>();
         params.put("start", start);
         params.put("end", end);
-        params.put("uris", uris);
+        if (uris != null) {
+            params.put("uris", uris);
+        }
         params.put("unique", unique);
         return statClnt.getStats(params);
     }

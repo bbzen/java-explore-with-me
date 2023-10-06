@@ -1,12 +1,14 @@
 package ru.practicum.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.exception.HitInputDataInvalidException;
 import ru.practicum.mapper.HitMapper;
+import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.HitRepository;
 
 import java.net.URLDecoder;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class HitServiceImpl implements HitService {
@@ -25,7 +28,8 @@ public class HitServiceImpl implements HitService {
 
     public void create(EndpointHitDto endpointHitDto) {
         checkEndpointHitDto(endpointHitDto);
-        hitRepository.save(mapper.toStat(endpointHitDto));
+        EndpointHit endpointHit = hitRepository.save(mapper.toStat(endpointHitDto));
+        log.debug("Object has been saved: " + endpointHit.getId());
     }
 
     public List<ViewStatsDto> getHits(String start, String end, String[] uris, boolean unique) {

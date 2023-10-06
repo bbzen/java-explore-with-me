@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  ewm-server:
+    build: gateway
+    image: ewm-server_image
+    container_name: ewm-server-cont
+    depends_on:
+      - ewm-db
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+
+  ewm-db:
+    image: postgres:14-alpine
+    container_name: ewm-db-cont
+    ports:
+      - "6541:5431"
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      - POSTGRES_DB=ewmdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+
+  stat-server:
+    build: stat-server
+    image: stat-server_image
+    container_name: stat-server-cont
+    ports:
+      - "9090:9090"
+      - "9091:9091"
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/statdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=pass
+
+  stat-db:
+    image: postgres:14-alpine
+    container_name: stat-db-cont
+    ports:
+      - "6542:5432"
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      - POSTGRES_DB=statdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass

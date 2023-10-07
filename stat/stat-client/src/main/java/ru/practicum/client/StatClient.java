@@ -18,12 +18,12 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class StatClnt {
+public class StatClient {
     private static final String API_POST_PREFIX = "/hit";
     private final RestTemplate rest;
 
     @Autowired
-    public StatClnt(@Value("${ewm-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatClient(@Value("${ewm-server.url}") String serverUrl, RestTemplateBuilder builder) {
         this.rest = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();

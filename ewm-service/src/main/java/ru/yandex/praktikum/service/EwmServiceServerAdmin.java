@@ -2,12 +2,15 @@ package ru.yandex.praktikum.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.yandex.praktikum.exception.ValidationException;
 import ru.yandex.praktikum.mapper.UserMapper;
 import ru.yandex.praktikum.model.NewUserRequest;
 import ru.yandex.praktikum.model.UserDto;
 import ru.yandex.praktikum.repository.UserRepository;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -18,16 +21,19 @@ public class EwmServiceServerAdmin {
     private UserMapper userMapper;
 
     public UserDto createUser(NewUserRequest userRequest) {
-        checkNewUserRequest(userRequest);
         return userRepository.save(userMapper.toUserDto(userRequest));
     }
 
-    private void checkNewUserRequest(NewUserRequest nur) {
-        if (nur.getEmail() == null || nur.getEmail().isBlank() || !nur.getEmail().contains("@") || nur.getEmail().length() < 6 || 254 < nur.getEmail().length()) {
-            throw new ValidationException("Адрес электронной почты не может быть пустой и должен содержать символ @");
+    public List<UserDto> findUsers(List<Long> ids, Integer from, Integer size) {
+        if (ids != null && !ids.isEmpty()) {
+            return userRepository.findAllById(ids);
+        } else {
+            Pageable page = PageRequest.of(Math.abs(from / size), size);
+            return userRepository.findAll(page).toList();
         }
-        if (nur.getName() == null || nur.getName().isBlank() ||  nur.getName().length() < 2 || 250 < nur.getName().length()) {
-            throw new ValidationException("Имя дб больше 2 и меньше 250 символов.");
-        }
+    }
+
+    public void deleteUser(long userId) {
+        userRepository.deleteById(userId);
     }
 }

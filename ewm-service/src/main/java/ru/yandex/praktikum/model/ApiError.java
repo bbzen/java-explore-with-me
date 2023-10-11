@@ -2,19 +2,24 @@ package ru.yandex.praktikum.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Setter
 @Getter
 public class ApiError {
     private List<String> errors;
     private String message;
     private String reason;
-    private String status;
-    private String timestamp;
+    private HttpStatus status;
+    private final String timestamp;
+
+    public ApiError() {
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
 }

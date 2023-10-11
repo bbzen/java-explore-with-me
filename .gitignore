@@ -34,3 +34,5 @@ build/
 /db/ewmdb.mv.db
 /db/ewmdb.trace.db
 /db/shareitdb.mv.db
+/db/ewmmsdb.mv.db
+/db/ewmmsdb.trace.db

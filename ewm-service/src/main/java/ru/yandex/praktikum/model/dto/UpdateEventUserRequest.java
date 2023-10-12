@@ -1,14 +1,10 @@
-package ru.yandex.praktikum.model;
+package ru.yandex.praktikum.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import ru.yandex.praktikum.model.Location;
+import ru.yandex.praktikum.model.StateAction;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class UpdateEventUserRequest {
     private String annotation;
     private Long category;

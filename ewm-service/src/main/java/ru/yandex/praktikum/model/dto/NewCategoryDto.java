@@ -1,17 +1,11 @@
-package ru.yandex.praktikum.model;
+package ru.yandex.praktikum.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class NewCategoryDto {
     @NotNull(message = "Invalid category name.")
     @Size(min = 1, message = "Category`s name length must be more than 1 char.")

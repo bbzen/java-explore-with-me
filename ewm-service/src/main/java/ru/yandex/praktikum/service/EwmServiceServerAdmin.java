@@ -7,14 +7,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.yandex.praktikum.mapper.CategoryMapper;
 import ru.yandex.praktikum.mapper.UserMapper;
-import ru.yandex.praktikum.model.CategoryDto;
-import ru.yandex.praktikum.model.NewCategoryDto;
-import ru.yandex.praktikum.model.NewUserRequest;
-import ru.yandex.praktikum.model.UserDto;
+import ru.yandex.praktikum.model.User;
+import ru.yandex.praktikum.model.dto.CategoryDto;
+import ru.yandex.praktikum.model.dto.NewCategoryDto;
+import ru.yandex.praktikum.model.dto.NewUserRequest;
+import ru.yandex.praktikum.model.dto.UserDto;
 import ru.yandex.praktikum.repository.CategoryRepository;
 import ru.yandex.praktikum.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,16 +31,18 @@ public class EwmServiceServerAdmin {
     private final CategoryMapper categoryMapper;
 
     public UserDto createUser(NewUserRequest userRequest) {
-        return userRepository.save(userMapper.toUserDto(userRequest));
+        return userMapper.toUserDto(userRepository.save(userMapper.toUser(userRequest)));
     }
 
     public List<UserDto> findUsers(List<Long> ids, Integer from, Integer size) {
+        List<User> result;
         if (ids != null && !ids.isEmpty()) {
-            return userRepository.findAllById(ids);
+            result = userRepository.findAllById(ids);
         } else {
             Pageable page = PageRequest.of(Math.abs(from / size), size);
-            return userRepository.findAll(page).toList();
+            result =  userRepository.findAll(page).toList();
         }
+        return result.stream().map(userMapper::toUserDto).collect(Collectors.toList());
     }
 
     public void deleteUser(Long userId) {
@@ -46,11 +50,11 @@ public class EwmServiceServerAdmin {
     }
 
     public CategoryDto createCategory(NewCategoryDto dto) {
-        return categoryRepository.save(categoryMapper.toCategoryDto(dto));
+        return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(dto)));
     }
 
     public CategoryDto updateCategory(NewCategoryDto dto, Long catId) {
-        categoryRepository.updateById(dto.getName(), catId);
+        categoryRepository.updateNameById(dto.getName(), catId);
         return new CategoryDto(catId, dto.getName());
     }
 

@@ -2,12 +2,15 @@ package ru.yandex.praktikum.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import ru.yandex.praktikum.model.CategoryDto;
-import ru.yandex.praktikum.model.NewCategoryDto;
+import ru.yandex.praktikum.model.Category;
+import ru.yandex.praktikum.model.dto.CategoryDto;
+import ru.yandex.praktikum.model.dto.NewCategoryDto;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
-    CategoryDto toCategoryDto(NewCategoryDto dto);
+    Category toCategory(NewCategoryDto dto);
+
+    CategoryDto toCategoryDto(Category cat);
 }

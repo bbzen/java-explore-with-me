@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.praktikum.model.CategoryDto;
-import ru.yandex.praktikum.model.NewCategoryDto;
-import ru.yandex.praktikum.model.NewUserRequest;
-import ru.yandex.praktikum.model.UserDto;
+import ru.yandex.praktikum.model.dto.CategoryDto;
+import ru.yandex.praktikum.model.dto.NewCategoryDto;
+import ru.yandex.praktikum.model.dto.NewUserRequest;
+import ru.yandex.praktikum.model.dto.UserDto;
 import ru.yandex.praktikum.service.EwmServiceServerAdmin;
 
 import javax.validation.Valid;
@@ -25,7 +25,7 @@ public class EwmServiceControllerAdmin {
         return serviceServerAdmin.findUsers(ids, from, size);
     }
 
-    @PatchMapping("/users/{userId}")
+    @PatchMapping("/categories/{catId}")
     public CategoryDto updateCategory(@RequestBody NewCategoryDto dto, @PathVariable Long catId) {
         return serviceServerAdmin.updateCategory(dto, catId);
     }

@@ -1,15 +1,11 @@
-package ru.yandex.praktikum.model;
+package ru.yandex.praktikum.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import ru.yandex.praktikum.model.Location;
+import ru.yandex.praktikum.model.StateAction;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class NewEventDto {
+@Data
+public class UpdateEventAdminRequest {
     private String annotation;
     private Long category;
     private String description;
@@ -18,5 +14,6 @@ public class NewEventDto {
     private Boolean paid;
     private Integer participantsLimit;
     private Boolean requestModeration;
+    private StateAction stateAction;
     private String title;
 }

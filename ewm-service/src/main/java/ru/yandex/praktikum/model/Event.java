@@ -5,19 +5,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
+import javax.persistence.*;
+
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventFullDto {
+@Getter
+@Setter
+@Entity
+@Table(name = "events", schema = "public")
+public class Event {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String annotation;
-    private CategoryDto category;
+    @ManyToOne
+    private Category category;
     private Long confirmedRequests;
     private String createdOn;
     private String description;
     private String eventDate;
     private Long id;
-    private UserShortDto initiator;
+    @ManyToOne
+    private User initiator;
+    @OneToOne
     private Location location;
     private Boolean paid;
     private Integer participantsLimit;

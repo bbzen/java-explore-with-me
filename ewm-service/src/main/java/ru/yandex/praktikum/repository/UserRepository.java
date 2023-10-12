@@ -1,7 +1,7 @@
 package ru.yandex.praktikum.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.yandex.praktikum.model.UserDto;
+import ru.yandex.praktikum.model.User;
 
-public interface UserRepository extends JpaRepository<UserDto, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 }

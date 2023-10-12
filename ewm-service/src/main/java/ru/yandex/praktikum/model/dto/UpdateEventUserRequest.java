@@ -2,7 +2,7 @@ package ru.yandex.praktikum.model.dto;
 
 import lombok.Data;
 import ru.yandex.praktikum.model.Location;
-import ru.yandex.praktikum.model.StateAction;
+import ru.yandex.praktikum.model.status.StateAction;
 
 @Data
 public class UpdateEventUserRequest {

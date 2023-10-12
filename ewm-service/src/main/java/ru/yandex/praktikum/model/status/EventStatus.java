@@ -1,4 +1,4 @@
-package ru.yandex.praktikum.model;
+package ru.yandex.praktikum.model.status;
 
 public enum EventStatus {
     PENDING,

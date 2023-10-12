@@ -1,8 +1,8 @@
 package ru.yandex.praktikum.model.dto;
 
 import lombok.Data;
-import ru.yandex.praktikum.model.EventStatus;
 import ru.yandex.praktikum.model.Location;
+import ru.yandex.praktikum.model.status.EventStatus;
 
 @Data
 public class EventFullDto {

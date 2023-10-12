@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.yandex.praktikum.model.status.EventStatus;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,9 +22,9 @@ public class Event {
     @ManyToOne
     private Category category;
     private Long confirmedRequests;
-    private String createdOn;
+    private LocalDateTime createdOn;
     private String description;
-    private String eventDate;
+    private LocalDateTime eventDate;
     private Long id;
     @ManyToOne
     private User initiator;
@@ -30,7 +32,7 @@ public class Event {
     private Location location;
     private Boolean paid;
     private Integer participantsLimit;
-    private String publishedOn;
+    private LocalDateTime publishedOn;
     private Boolean requestModeration;
     private EventStatus state;
     private String title;

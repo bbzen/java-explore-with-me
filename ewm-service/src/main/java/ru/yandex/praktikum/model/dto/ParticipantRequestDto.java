@@ -1,7 +1,7 @@
 package ru.yandex.praktikum.model.dto;
 
 import lombok.Data;
-import ru.yandex.praktikum.model.ParticipationRequestStatus;
+import ru.yandex.praktikum.model.status.ParticipationRequestStatus;
 
 @Data
 public class ParticipantRequestDto {

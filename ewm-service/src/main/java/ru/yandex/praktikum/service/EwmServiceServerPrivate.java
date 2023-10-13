@@ -19,6 +19,8 @@ import ru.yandex.praktikum.repository.EventRepository;
 import ru.yandex.praktikum.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -30,6 +32,14 @@ public class EwmServiceServerPrivate {
     @Autowired
     private EventMapper eventMapper;
 
+    //GET /users/{userId}/events
+    // Получение событий, добавленных текущим пользователем
+    public List<EventFullDto> findAllUserEvents(Long userId) {
+        return eventRepository.findAllByInitiator(userId).stream().map(eventMapper::toEventFullDto).collect(Collectors.toList());
+    }
+
+    //POST /users/{userId}/events
+    // Добавление нового события
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         checkNewEventDto(newEventDto);
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
@@ -41,6 +51,18 @@ public class EwmServiceServerPrivate {
         return eventMapper.toEventFullDto(eventRepository.save(result));
     }
 
+    // GET /users/{userId}/events/{eventId}
+    // Получение полной информации о событии добавленном текущим пользователем
+    public EventFullDto findUserEvent(Long userId, Long eventId) {
+        Event result = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event" + eventId + "not found."));
+        if (result.getInitiator().getId() != userId) {
+            throw new DataAccessException("The user isn`t an initiator of the Event. Restricted to edit.");
+        }
+        return eventMapper.toEventFullDto(result);
+    }
+
+    //PATCH /users/{userId}/events/{eventId}
+    //Изменение события добавленного текущим пользователем
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updEvent) {
         checkNewEventDto(updEvent);
         Event srcEvent = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found."));

@@ -14,7 +14,7 @@ public class EventFullDto {
     private Long confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
-    private String eventDate;
+    private LocalDateTime eventDate;
     private UserShortDto initiator;
     private Location location;
     private Boolean paid;

@@ -8,7 +8,7 @@ import ru.yandex.praktikum.model.dto.NewEventDto;
 import ru.yandex.praktikum.model.dto.UpdateEventAdminRequest;
 import ru.yandex.praktikum.model.dto.UpdateEventUserRequest;
 
-@Mapper(componentModel = "spring", uses = CategoryMapper.class)
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class, UserMapper.class})
 public interface EventMapper {
     EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
 

@@ -31,10 +31,8 @@ public class EwmServiceServerAdmin {
     @Autowired
     private final CategoryMapper categoryMapper;
 
-    public UserDto createUser(NewUserRequest userRequest) {
-        return userMapper.toUserDto(userRepository.save(userMapper.toUser(userRequest)));
-    }
-
+    //GET /admin/users
+    //Получение информации о пользователях
     public List<UserDto> findUsers(List<Long> ids, Integer from, Integer size) {
         List<User> result;
         if (ids != null && !ids.isEmpty()) {
@@ -46,20 +44,35 @@ public class EwmServiceServerAdmin {
         return result.stream().map(userMapper::toUserDto).collect(Collectors.toList());
     }
 
+    //POST /admin/users
+    //Добавление нового пользователя
+    public UserDto createUser(NewUserRequest userRequest) {
+        return userMapper.toUserDto(userRepository.save(userMapper.toUser(userRequest)));
+    }
+
+    //DELETE /admin/users/{userId}
+    //Удаление пользователя
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
 
+
+    //POST /admin/categories
+    //Добавление новой категории
     public CategoryDto createCategory(NewCategoryDto dto) {
         return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(dto)));
     }
 
+    //PATCH /admin/categories/{catId}
+    //Изменение категории
     public CategoryDto updateCategory(NewCategoryDto dto, Long catId) {
         Category catToSave = categoryMapper.toCategory(dto);
         catToSave.setId(catId);
         return categoryMapper.toCategoryDto(categoryRepository.save(catToSave));
     }
 
+    //DELETE /admin/categories/{catId}
+    //Удаление категории
     public void deleteCategory(Long catId) {
         categoryRepository.deleteById(catId);
     }

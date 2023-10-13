@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.yandex.praktikum.exception.EntityValidationException;
+import ru.yandex.praktikum.exception.InvalidParamsException;
 import ru.yandex.praktikum.exception.NotFoundException;
 import ru.yandex.praktikum.model.ApiError;
 
@@ -57,6 +58,17 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
 
         apiError.setReason("Entity somehow was not found.");
         apiError.setStatus(HttpStatus.CONFLICT);
+        apiError.setMessage(e.getLocalizedMessage());
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleInvalidParamsException(final InvalidParamsException e) {
+        ApiError apiError = new ApiError();
+
+        apiError.setReason("Entity somehow was not found.");
+        apiError.setStatus(HttpStatus.BAD_REQUEST);
         apiError.setMessage(e.getLocalizedMessage());
         return apiError;
     }

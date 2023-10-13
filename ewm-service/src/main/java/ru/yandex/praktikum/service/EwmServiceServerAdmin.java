@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.yandex.praktikum.mapper.CategoryMapper;
 import ru.yandex.praktikum.mapper.UserMapper;
+import ru.yandex.praktikum.model.Category;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.dto.CategoryDto;
 import ru.yandex.praktikum.model.dto.NewCategoryDto;
@@ -54,8 +55,9 @@ public class EwmServiceServerAdmin {
     }
 
     public CategoryDto updateCategory(NewCategoryDto dto, Long catId) {
-        categoryRepository.updateNameById(dto.getName(), catId);
-        return new CategoryDto(catId, dto.getName());
+        Category catToSave = categoryMapper.toCategory(dto);
+        catToSave.setId(catId);
+        return categoryMapper.toCategoryDto(categoryRepository.save(catToSave));
     }
 
     public void deleteCategory(Long catId) {

@@ -4,12 +4,14 @@ import lombok.Data;
 import ru.yandex.praktikum.model.Location;
 import ru.yandex.praktikum.model.status.StateAction;
 
+import java.time.LocalDateTime;
+
 @Data
-public class UpdateEventUserRequest {
+public class UpdateEventUserRequest implements DatedEvent {
     private String annotation;
     private Long category;
     private String description;
-    private String eventDate;
+    private LocalDateTime eventDate;
     private Location location;
     private Boolean paid;
     private Integer participantsLimit;

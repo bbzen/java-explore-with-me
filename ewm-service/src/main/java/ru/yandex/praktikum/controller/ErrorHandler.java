@@ -6,9 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.yandex.praktikum.exception.EntityValidationException;
+import ru.yandex.praktikum.exception.NotFoundException;
 import ru.yandex.praktikum.model.ApiError;
 
 import java.util.ArrayList;
@@ -35,5 +39,25 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleValidationException(final EntityValidationException e) {
+        ApiError apiError = new ApiError();
 
+        apiError.setReason("Incorrectly made request.");
+        apiError.setStatus(HttpStatus.CONFLICT);
+        apiError.setMessage(e.getLocalizedMessage());
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleNotFoundException(final NotFoundException e) {
+        ApiError apiError = new ApiError();
+
+        apiError.setReason("Entity somehow was not found.");
+        apiError.setStatus(HttpStatus.CONFLICT);
+        apiError.setMessage(e.getLocalizedMessage());
+        return apiError;
+    }
 }

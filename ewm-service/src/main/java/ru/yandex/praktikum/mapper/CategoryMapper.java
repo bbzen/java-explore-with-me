@@ -13,4 +13,13 @@ public interface CategoryMapper {
     Category toCategory(NewCategoryDto dto);
 
     CategoryDto toCategoryDto(Category cat);
+
+    default Category toCategory(Long category) {
+        if (category == null) {
+            return null;
+        }
+        Category result = new Category();
+        result.setId(category);
+        return result;
+    }
 }

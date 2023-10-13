@@ -19,9 +19,9 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String created;
-    @OneToMany
+    @ManyToOne
     private Event event;
-    @OneToMany
+    @ManyToOne
     private User requester;
     private ParticipationRequestStatus status;
 }

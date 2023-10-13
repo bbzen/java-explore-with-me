@@ -4,15 +4,17 @@ import lombok.Data;
 import ru.yandex.praktikum.model.Location;
 import ru.yandex.praktikum.model.status.EventStatus;
 
+import java.time.LocalDateTime;
+
 @Data
 public class EventFullDto {
+    private Long id;
     private String annotation;
     private CategoryDto category;
     private Long confirmedRequests;
-    private String createdOn;
+    private LocalDateTime createdOn;
     private String description;
     private String eventDate;
-    private Long id;
     private UserShortDto initiator;
     private Location location;
     private Boolean paid;

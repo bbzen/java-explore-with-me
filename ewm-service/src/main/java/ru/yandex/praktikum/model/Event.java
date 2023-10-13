@@ -18,22 +18,26 @@ import java.time.LocalDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String annotation;
     @ManyToOne
+    @JoinColumn(name = "category")
     private Category category;
     private Long confirmedRequests;
     private LocalDateTime createdOn;
     private String description;
     private LocalDateTime eventDate;
-    private Long id;
     @ManyToOne
+    @JoinColumn(name = "initiator")
     private User initiator;
     @OneToOne
+    @JoinColumn(name = "location")
     private Location location;
     private Boolean paid;
     private Integer participantsLimit;
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
+    @Enumerated(EnumType.STRING)
     private EventStatus state;
     private String title;
     private Long views;

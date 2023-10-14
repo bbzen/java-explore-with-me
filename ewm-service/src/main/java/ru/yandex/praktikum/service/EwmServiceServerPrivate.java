@@ -3,19 +3,22 @@ package ru.yandex.praktikum.service;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.praktikum.exception.DataAccessException;
 import ru.yandex.praktikum.exception.EntityValidationException;
 import ru.yandex.praktikum.exception.NotFoundException;
 import ru.yandex.praktikum.mapper.EventMapper;
+import ru.yandex.praktikum.mapper.LocationMapper;
+import ru.yandex.praktikum.model.Category;
 import ru.yandex.praktikum.model.Event;
+import ru.yandex.praktikum.model.Location;
 import ru.yandex.praktikum.model.User;
-import ru.yandex.praktikum.model.dto.DatedEvent;
-import ru.yandex.praktikum.model.dto.EventFullDto;
-import ru.yandex.praktikum.model.dto.NewEventDto;
-import ru.yandex.praktikum.model.dto.UpdateEventUserRequest;
+import ru.yandex.praktikum.model.dto.*;
 import ru.yandex.praktikum.model.status.EventStatus;
 import ru.yandex.praktikum.model.status.StateAction;
+import ru.yandex.praktikum.repository.CategoryRepository;
 import ru.yandex.praktikum.repository.EventRepository;
+import ru.yandex.praktikum.repository.LocationRepository;
 import ru.yandex.praktikum.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -30,7 +33,13 @@ public class EwmServiceServerPrivate {
     @Autowired
     private final UserRepository userRepository;
     @Autowired
-    private EventMapper eventMapper;
+    private final CategoryRepository categoryRepository;
+    @Autowired
+    private final LocationRepository locationRepository;
+    @Autowired
+    private final EventMapper eventMapper;
+    @Autowired
+    private final LocationMapper locationMapper;
 
     //GET /users/{userId}/events
     // Получение событий, добавленных текущим пользователем
@@ -40,10 +49,16 @@ public class EwmServiceServerPrivate {
 
     //POST /users/{userId}/events
     // Добавление нового события
+    @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         checkNewEventDto(newEventDto);
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
         Event result = eventMapper.toEventFromNew(newEventDto);
+        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new NotFoundException("There is no category with id " + newEventDto.getCategory()));
+        Location location = getLocation(newEventDto.getLocation());
+
+        result.setCategory(category);
+        result.setLocation(location);
         result.setCreatedOn(LocalDateTime.now());
         result.setInitiator(initiator);
         result.setState(EventStatus.PENDING);
@@ -89,5 +104,10 @@ public class EwmServiceServerPrivate {
         if (dto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new EntityValidationException("Event time can`t be in 2 hours before beginning.");
         }
+    }
+
+    //gets Location from repo if it exists, and saves if not.
+    private Location getLocation(NewLocationDto dto) {
+        return locationRepository.findByLatAndLon(dto.getLat(), dto.getLon()).orElse(locationRepository.save(locationMapper.toLocation(dto)));
     }
 }

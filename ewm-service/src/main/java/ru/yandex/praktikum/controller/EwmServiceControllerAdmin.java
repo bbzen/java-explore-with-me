@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EwmServiceControllerAdmin {
     @Autowired
-    private final EwmServiceServerAdmin serviceServerAdmin;
+    private EwmServiceServerAdmin serviceServerAdmin;
 
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam List<Long> ids, @RequestParam(required = false, defaultValue = "0") Integer from, @RequestParam(required = false, defaultValue = "10") Integer size) {
@@ -32,13 +32,13 @@ public class EwmServiceControllerAdmin {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@RequestBody @Valid NewUserRequest userRequest) {
+    public UserDto createUser(@Valid @RequestBody NewUserRequest userRequest) {
         return serviceServerAdmin.createUser(userRequest);
     }
 
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto createCategory(@RequestBody @Valid NewCategoryDto categoryDto) {
+    public CategoryDto createCategory(@Valid @RequestBody NewCategoryDto categoryDto) {
         return serviceServerAdmin.createCategory(categoryDto);
     }
 

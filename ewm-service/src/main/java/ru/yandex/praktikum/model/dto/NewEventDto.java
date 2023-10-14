@@ -1,13 +1,19 @@
 package ru.yandex.praktikum.model.dto;
 
-import lombok.Data;
-import ru.yandex.praktikum.model.Location;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewEventDto implements DatedEvent {
     @NotNull(message = "Invalid event annotation.")
     @Size(min = 20, message = "Event annotation must be more than 20 char.")
@@ -18,8 +24,9 @@ public class NewEventDto implements DatedEvent {
     @Size(min = 20, message = "Event description must be more than 20 char.")
     @Size(max = 7000, message = "Event description must be less than 7000 char.")
     private String description;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
-    private Location location;
+    private NewLocationDto location;
     private Boolean paid;
     private Integer participantsLimit;
     private Boolean requestModeration;

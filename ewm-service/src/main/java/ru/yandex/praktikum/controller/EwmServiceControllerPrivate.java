@@ -8,6 +8,7 @@ import ru.yandex.praktikum.model.dto.NewEventDto;
 import ru.yandex.praktikum.model.dto.UpdateEventUserRequest;
 import ru.yandex.praktikum.service.EwmServiceServerPrivate;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -15,24 +16,24 @@ import java.util.List;
 @AllArgsConstructor
 public class EwmServiceControllerPrivate {
     @Autowired
-    private final EwmServiceServerPrivate serverPrivate;
+    private EwmServiceServerPrivate serverPrivate;
 
-    @GetMapping("/users/{userId}/events")
+    @GetMapping("/{userId}/events")
     public List<EventFullDto> findAllUserEvents(@PathVariable Long userId) {
         return serverPrivate.findAllUserEvents(userId);
     }
 
-    @PostMapping("/users/{userId}/events")
-    public EventFullDto createEvent(@PathVariable Long userId, @RequestBody NewEventDto dto) {
+    @PostMapping("/{userId}/events")
+    public EventFullDto createEvent(@PathVariable Long userId, @Valid @RequestBody NewEventDto dto) {
         return serverPrivate.createEvent(userId, dto);
     }
 
-    @GetMapping("/users/{userId}/events/{eventId}")
+    @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto findUserEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         return serverPrivate.findUserEvent(userId, eventId);
     }
 
-    @PatchMapping("/users/{userId}/events/{eventId}")
+    @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long userId, @PathVariable Long eventId, @RequestBody UpdateEventUserRequest dto) {
         return serverPrivate.updateEvent(userId, eventId, dto);
     }

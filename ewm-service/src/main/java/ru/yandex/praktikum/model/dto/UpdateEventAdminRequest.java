@@ -14,7 +14,7 @@ public class UpdateEventAdminRequest implements DatedEvent {
     private LocalDateTime eventDate;
     private Location location;
     private Boolean paid;
-    private Integer participantsLimit;
+    private Integer participantLimit;
     private Boolean requestModeration;
     private StateAction stateAction;
     private String title;

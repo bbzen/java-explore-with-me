@@ -28,7 +28,7 @@ public class NewEventDto implements DatedEvent {
     private LocalDateTime eventDate;
     private NewLocationDto location;
     private Boolean paid;
-    private Integer participantsLimit;
+    private Integer participantLimit;
     private Boolean requestModeration;
     @NotNull(message = "Invalid event description.")
     @Size(min = 3, message = "Event description must be more than 20 char.")

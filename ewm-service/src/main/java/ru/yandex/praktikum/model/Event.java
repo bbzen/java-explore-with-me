@@ -34,7 +34,7 @@ public class Event {
     @JoinColumn(name = "location")
     private Location location;
     private Boolean paid;
-    private Integer participantsLimit;
+    private Integer participantLimit;
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
     @Enumerated(EnumType.STRING)

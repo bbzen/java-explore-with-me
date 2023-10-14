@@ -63,6 +63,9 @@ public class EwmServiceServerPrivate {
         result.setInitiator(initiator);
         result.setState(EventStatus.PENDING);
         result.setViews(0L);
+        result.setPaid(newEventDto.getPaid() != null && newEventDto.getPaid());
+        result.setParticipantLimit(newEventDto.getParticipantLimit() == null ? 0 : newEventDto.getParticipantLimit());
+        result.setRequestModeration(newEventDto.getRequestModeration() == null || newEventDto.getRequestModeration());
         return eventMapper.toEventFullDto(eventRepository.save(result));
     }
 

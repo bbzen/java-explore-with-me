@@ -2,6 +2,7 @@ package ru.yandex.praktikum.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.praktikum.model.dto.EventFullDto;
 import ru.yandex.praktikum.model.dto.NewEventDto;
@@ -24,6 +25,7 @@ public class EwmServiceControllerPrivate {
     }
 
     @PostMapping("/{userId}/events")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable Long userId, @Valid @RequestBody NewEventDto dto) {
         return serverPrivate.createEvent(userId, dto);
     }

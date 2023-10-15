@@ -3,7 +3,6 @@ package ru.yandex.praktikum.service;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.praktikum.exception.DataAccessException;
 import ru.yandex.praktikum.exception.EntityValidationException;
 import ru.yandex.praktikum.exception.NotFoundException;
@@ -49,7 +48,6 @@ public class EwmServiceServerPrivate {
 
     //POST /users/{userId}/events
     // Добавление нового события
-    @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         checkNewEventDto(newEventDto);
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
@@ -101,6 +99,18 @@ public class EwmServiceServerPrivate {
         StateAction currentAction = updEvent.getStateAction();
         //todo something with statAction
         return eventMapper.toEventFullDto(eventRepository.save(result));
+    }
+
+    //GET /users/{userId}/events/{eventId}/requests
+    //Получение информации о запросах на участие в событии текущего пользователя
+    public List<ParticipationRequestDto> findAllParticipationRequests(Long userId, Long eventId) {
+        return null;
+    }
+
+    //PATCH /users/{userId}/events/{eventId}/requests
+    //Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя
+    public EventRequestStatusUpdateResult updateParticipationRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest dto) {
+        return null;
     }
 
     private void checkNewEventDto(DatedEvent dto) {

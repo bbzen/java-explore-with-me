@@ -1,5 +1,7 @@
 package ru.yandex.praktikum.model.status;
 
 public enum ParticipationRequestStatus {
-    PENDING
+    PENDING,
+    APPROVED,
+    REJECTED
 }

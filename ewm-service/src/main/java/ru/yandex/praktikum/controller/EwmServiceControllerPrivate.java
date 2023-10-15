@@ -39,4 +39,6 @@ public class EwmServiceControllerPrivate {
     public EventFullDto updateEvent(@PathVariable Long userId, @PathVariable Long eventId, @RequestBody UpdateEventUserRequest dto) {
         return serverPrivate.updateEvent(userId, eventId, dto);
     }
+
+
 }

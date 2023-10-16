@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.yandex.praktikum.model.Category;
 import ru.yandex.praktikum.model.dto.CategoryDto;
@@ -10,6 +11,7 @@ import ru.yandex.praktikum.model.dto.NewCategoryDto;
 public interface CategoryMapper {
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
+    @Mapping(target = "id", ignore = true)
     Category toCategory(NewCategoryDto dto);
 
     CategoryDto toCategoryDto(Category cat);

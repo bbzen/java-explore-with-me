@@ -51,9 +51,9 @@ public class EwmServiceServerPrivate {
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         checkNewEventDto(newEventDto);
         User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
-        Event result = eventMapper.toEventFromNew(newEventDto);
         Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new NotFoundException("There is no category with id " + newEventDto.getCategory()));
         Location location = getLocation(newEventDto.getLocation());
+        Event result = eventMapper.toEventFromNew(newEventDto, category, location);
 
         result.setCategory(category);
         result.setLocation(location);

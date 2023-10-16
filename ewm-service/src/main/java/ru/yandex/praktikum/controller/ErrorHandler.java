@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.yandex.praktikum.exception.EntityValidationException;
-import ru.yandex.praktikum.exception.InvalidParamsException;
+import ru.yandex.praktikum.exception.BadRequestException;
 import ru.yandex.praktikum.exception.NotFoundException;
+import ru.yandex.praktikum.exception.OnConflictException;
 import ru.yandex.praktikum.model.ApiError;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleValidationException(final EntityValidationException e) {
+    public ApiError handleValidationException(final OnConflictException e) {
         ApiError apiError = new ApiError();
 
         apiError.setReason("Incorrectly made request.");
@@ -64,7 +64,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleInvalidParamsException(final InvalidParamsException e) {
+    public ApiError handleInvalidParamsException(final BadRequestException e) {
         ApiError apiError = new ApiError();
 
         apiError.setReason("Entity somehow was not found.");

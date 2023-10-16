@@ -1,16 +1,10 @@
 package ru.yandex.praktikum.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class EventRequestStatusUpdateRequest {
     private List<Long> requestIds;
     private EventRequestStatus status;

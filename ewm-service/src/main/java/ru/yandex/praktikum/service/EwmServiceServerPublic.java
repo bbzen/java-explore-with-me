@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
-import ru.yandex.praktikum.exception.InvalidParamsException;
+import ru.yandex.praktikum.exception.BadRequestException;
 import ru.yandex.praktikum.exception.NotFoundException;
 import ru.yandex.praktikum.mapper.CategoryMapper;
 import ru.yandex.praktikum.model.dto.CategoryDto;
@@ -33,7 +33,7 @@ public class EwmServiceServerPublic {
     //Получение категорий
     public List<CategoryDto> findAllCategories(Integer from, Integer size) {
         if (from < 0 || size < 0) {
-            throw new InvalidParamsException("From and size params cant be negative.");
+            throw new BadRequestException("From and size params cant be negative.");
         }
         Pageable page = PageRequest.of(Math.abs(from / size), size);
         return categoryRepository.findAll(page).toList().stream().map(categoryMapper::toCategoryDto).collect(Collectors.toList());

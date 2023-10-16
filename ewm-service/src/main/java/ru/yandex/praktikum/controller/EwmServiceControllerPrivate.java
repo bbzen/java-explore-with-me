@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.praktikum.model.dto.EventFullDto;
-import ru.yandex.praktikum.model.dto.NewEventDto;
-import ru.yandex.praktikum.model.dto.UpdateEventUserRequest;
+import ru.yandex.praktikum.model.dto.*;
 import ru.yandex.praktikum.service.EwmServiceServerPrivate;
 
 import javax.validation.Valid;
@@ -36,9 +34,17 @@ public class EwmServiceControllerPrivate {
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
-    public EventFullDto updateEvent(@PathVariable Long userId, @PathVariable Long eventId, @RequestBody UpdateEventUserRequest dto) {
+    public EventFullDto updateEvent(@PathVariable Long userId, @PathVariable Long eventId, @Valid @RequestBody UpdateEventUserRequest dto) {
         return serverPrivate.updateEvent(userId, eventId, dto);
     }
 
+    @GetMapping("/{userId}/events/{eventId}/requests")
+    public List<ParticipationRequestDto> findAllParticipationRequests(@PathVariable Long userId, @PathVariable Long eventId) {
+        return serverPrivate.findAllParticipationRequests(userId, eventId);
+    }
 
+    @PatchMapping("/{userId}/events/{eventId}/requests")
+    public EventRequestStatusUpdateResult updateParticipationRequest(@PathVariable Long userId, @PathVariable Long eventId, @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
+        return serverPrivate.updateParticipationRequest(userId, eventId, dto);
+    }
 }

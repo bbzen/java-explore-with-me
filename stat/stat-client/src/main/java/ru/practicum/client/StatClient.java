@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.lang.Nullable;
@@ -12,6 +13,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.dto.ViewStatsDto;
 
 import java.util.List;
 import java.util.Map;
@@ -23,39 +25,39 @@ public class StatClient {
     private final RestTemplate rest;
 
     @Autowired
-    public StatClient(@Value("${ewm-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatClient(@Value("${stat-server.url}") String serverUrl, RestTemplateBuilder builder) {
         this.rest = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
     }
 
     public void postHit(EndpointHitDto dto) {
-        ResponseEntity<Object> response =  makeAndSendRequest(HttpMethod.POST, API_POST_PREFIX, null, dto);
+        ResponseEntity<List<ViewStatsDto>> response =  makeAndSendRequest(HttpMethod.POST, API_POST_PREFIX, null, dto);
         log.debug("Client post method response is: " + response.getStatusCode());
     }
 
-    public ResponseEntity<Object> getStats(Map<String, Object> parameters) {
+    public List<ViewStatsDto> getStats(Map<String, Object> parameters) {
         String getPrefix = "/stats?start={start}&end={end}&unique={unique}";
         if (parameters.containsKey("uris")) {
             getPrefix = "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
         }
-        ResponseEntity<Object> response = makeAndSendRequest(HttpMethod.GET, getPrefix, parameters, null);
+        ResponseEntity<List<ViewStatsDto>> response = makeAndSendRequest(HttpMethod.GET, getPrefix, parameters, null);
         log.debug("Client post method response is: " + response.getStatusCode());
-        return response;
+        return response.getBody();
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Map<String, Object> parameters, @Nullable T body) {
+    private <T> ResponseEntity<List<ViewStatsDto>> makeAndSendRequest(HttpMethod method, String path, Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
 
-        ResponseEntity<Object> ewmServerResponse;
+        ResponseEntity<List<ViewStatsDto>> ewmServerResponse;
         try {
             if (parameters != null) {
-                ewmServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+                ewmServerResponse = rest.exchange(path, method, requestEntity, new ParameterizedTypeReference<List<ViewStatsDto>>() {}, parameters);
             } else {
-                ewmServerResponse = rest.exchange(path, method, requestEntity, Object.class);
+                ewmServerResponse = rest.exchange(path, method, requestEntity, new ParameterizedTypeReference<List<ViewStatsDto>>() {});
             }
         } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            throw new RuntimeException(e.getLocalizedMessage());
         }
         return prepareClientResponse(ewmServerResponse);
     }
@@ -67,7 +69,7 @@ public class StatClient {
         return headers;
     }
 
-    private static ResponseEntity<Object> prepareClientResponse(ResponseEntity<Object> response) {
+    private static ResponseEntity<List<ViewStatsDto>> prepareClientResponse(ResponseEntity<List<ViewStatsDto>> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }

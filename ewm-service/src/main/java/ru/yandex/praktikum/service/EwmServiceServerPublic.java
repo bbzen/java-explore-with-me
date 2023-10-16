@@ -6,28 +6,46 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import ru.practicum.client.StatClient;
+import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.dto.ViewStatsDto;
 import ru.yandex.praktikum.exception.BadRequestException;
 import ru.yandex.praktikum.exception.NotFoundException;
 import ru.yandex.praktikum.mapper.CategoryMapper;
+import ru.yandex.praktikum.mapper.EventMapper;
+import ru.yandex.praktikum.model.Event;
 import ru.yandex.praktikum.model.dto.CategoryDto;
+import ru.yandex.praktikum.model.dto.EventFullDto;
 import ru.yandex.praktikum.model.dto.EventShortDto;
-import ru.yandex.praktikum.model.status.SortStatus;
+import ru.yandex.praktikum.model.status.EventStatus;
+import ru.yandex.praktikum.model.status.ParticipationRequestStatus;
 import ru.yandex.praktikum.repository.CategoryRepository;
+import ru.yandex.praktikum.repository.EventRepository;
+import ru.yandex.praktikum.repository.RequestRepository;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class EwmServiceServerPublic {
     @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     @Autowired
-    private CategoryMapper categoryMapper;
+    private final EventRepository eventRepository;
+    @Autowired
+    private final RequestRepository requestRepository;
+    @Autowired
+    private final CategoryMapper categoryMapper;
+    @Autowired
+    private final EventMapper eventMapper;
+    @Autowired
+    private final StatClient statClient;
+    private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
 
     //GET /categories
     //Получение категорий
@@ -47,28 +65,53 @@ public class EwmServiceServerPublic {
 
     //GET /events
     //Получение событий с возможностью фильтрации
-    public List<EventShortDto> findEvents(String text, List<Integer> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
-        LocalDateTime startLDT;
-        LocalDateTime endLDT;
-        if (!rangeStart.isBlank() && !rangeEnd.isBlank()) {
-            String startDecoded = URLDecoder.decode(rangeStart, StandardCharsets.UTF_8);
-            String endDecoded = URLDecoder.decode(rangeEnd, StandardCharsets.UTF_8);
-            startLDT = LocalDateTime.parse(startDecoded, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            endLDT = LocalDateTime.parse(endDecoded, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    public List<EventShortDto> findEvents(String text, List<Integer> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest request) {
+        if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
+            throw new BadRequestException("Start must to be before end date");
         }
-        Pageable page = PageRequest.of(Math.abs(from / size), size);
-        if (SortStatus.EVENT_DATE.name().equalsIgnoreCase(sort)) {
 
-        } else if (SortStatus.VIEWS.name().equalsIgnoreCase(sort)) {
+        statClient.postHit(EndpointHitDto.builder()
+                .app("ewm")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build());
 
-        }
+
+
         return null;
     }
 
     //GET /events/{id}
     //Получение подробной информации об опубликованном событии по его идентификатору
-    public EventShortDto findEventById(Long id) {
-        return null;
+    public EventFullDto findEventById(Long eventId, HttpServletRequest request) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event " + eventId + " not found."));
+
+        if (!event.getState().equals(EventStatus.PUBLISHED)) {
+            throw new NotFoundException("Event " + eventId + " was not published.");
+        }
+        statClient.postHit(EndpointHitDto.builder()
+                .app("ewm")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build());
+
+        Map<String, Object> paramsForRequest = Map.of(
+                "start", LocalDateTime.MIN.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "end", LocalDateTime.MAX.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "uris", List.of("/events/" + event.getId()),
+                "unique", true
+        );
+        List<ViewStatsDto> viewStatsDtos = statClient.getStats(paramsForRequest);
+        Long numberOfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventId, ParticipationRequestStatus.APPROVED);
+        Long numberOfViews = viewStatsDtos.isEmpty() ? 0L : viewStatsDtos.get(0).getHits();
+
+        EventFullDto result = eventMapper.toEventFullDto(event);
+        result.setConfirmedRequests(numberOfConfirmedRequests);
+        result.setViews(numberOfViews);
+        return result;
     }
 }
 

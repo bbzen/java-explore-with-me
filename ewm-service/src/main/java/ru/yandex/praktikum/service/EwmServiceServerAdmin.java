@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.yandex.praktikum.exception.NotFoundException;
 import ru.yandex.praktikum.mapper.CategoryMapper;
 import ru.yandex.praktikum.mapper.UserMapper;
 import ru.yandex.praktikum.model.Category;
@@ -53,6 +54,9 @@ public class EwmServiceServerAdmin {
     //DELETE /admin/users/{userId}
     //Удаление пользователя
     public void deleteUser(Long userId) {
+        if(!userRepository.existsById(userId)) {
+            throw new NotFoundException("User " + userId + " not found.");
+        }
         userRepository.deleteById(userId);
     }
 
@@ -66,6 +70,9 @@ public class EwmServiceServerAdmin {
     //PATCH /admin/categories/{catId}
     //Изменение категории
     public CategoryDto updateCategory(NewCategoryDto dto, Long catId) {
+        if(!categoryRepository.existsById(catId)) {
+            throw new NotFoundException("Category " + catId + " not found.");
+        }
         Category catToSave = categoryMapper.toCategory(dto);
         catToSave.setId(catId);
         return categoryMapper.toCategoryDto(categoryRepository.save(catToSave));
@@ -74,6 +81,9 @@ public class EwmServiceServerAdmin {
     //DELETE /admin/categories/{catId}
     //Удаление категории
     public void deleteCategory(Long catId) {
+        if(!categoryRepository.existsById(catId)) {
+            throw new NotFoundException("Category " + catId + " not found.");
+        }
         categoryRepository.deleteById(catId);
     }
 }

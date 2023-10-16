@@ -7,7 +7,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>ru.yandex.praktikum</groupId>
     <artifactId>ewm-service</artifactId>
     <packaging>jar</packaging>
 
@@ -68,6 +67,11 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>1.5.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.practicum</groupId>
+            <artifactId>stat-client</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class StatServerController {
     @Autowired
-    private HitService hitService;
+    private final HitService hitService;
 
     @PostMapping("/hit")
     public void createHit(@RequestBody EndpointHitDto dto) {

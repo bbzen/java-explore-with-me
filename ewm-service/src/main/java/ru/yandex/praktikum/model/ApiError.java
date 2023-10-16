@@ -1,12 +1,12 @@
 package ru.yandex.praktikum.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @AllArgsConstructor
@@ -17,9 +17,10 @@ public class ApiError {
     private String message;
     private String reason;
     private HttpStatus status;
-    private final String timestamp;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private final LocalDateTime timestamp;
 
     public ApiError() {
-        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.timestamp = LocalDateTime.now();
     }
 }

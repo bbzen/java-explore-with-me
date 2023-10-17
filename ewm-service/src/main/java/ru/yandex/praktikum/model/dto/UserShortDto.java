@@ -1,9 +1,15 @@
 package ru.yandex.praktikum.model.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserShortDto {
-    private long id;
+    private Long id;
     private String name;
 }

@@ -6,10 +6,7 @@ import org.mapstruct.factory.Mappers;
 import ru.yandex.praktikum.model.Category;
 import ru.yandex.praktikum.model.Event;
 import ru.yandex.praktikum.model.Location;
-import ru.yandex.praktikum.model.dto.EventFullDto;
-import ru.yandex.praktikum.model.dto.NewEventDto;
-import ru.yandex.praktikum.model.dto.UpdateEventAdminRequest;
-import ru.yandex.praktikum.model.dto.UpdateEventUserRequest;
+import ru.yandex.praktikum.model.dto.*;
 
 @Mapper(componentModel = "spring", uses = {CategoryMapper.class, UserMapper.class})
 public interface EventMapper {
@@ -35,4 +32,6 @@ public interface EventMapper {
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "views", ignore = true)
     EventFullDto toEventFullDto(Event event);
+
+    EventShortDto toEventShortDto(Event event);
 }

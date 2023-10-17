@@ -1,7 +1,6 @@
 package ru.practicum.service;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
@@ -11,13 +10,9 @@ import ru.practicum.mapper.HitMapper;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.repository.HitRepository;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Slf4j
 @Service
 @AllArgsConstructor
 public class HitServiceImpl implements HitService {
@@ -26,39 +21,31 @@ public class HitServiceImpl implements HitService {
     @Autowired
     private HitMapper mapper;
 
+    @Override
     public void create(EndpointHitDto endpointHitDto) {
         checkEndpointHitDto(endpointHitDto);
         EndpointHit endpointHit = hitRepository.save(mapper.toStat(endpointHitDto));
-        log.debug("Object has been saved: " + endpointHit.getId());
     }
 
-    public List<ViewStatsDto> getHits(String start, String end, String[] uris, boolean unique) {
-        checkGetParams(start, end);
-        String startDecoded = URLDecoder.decode(start, StandardCharsets.UTF_8);
-        String endDecoded = URLDecoder.decode(end, StandardCharsets.UTF_8);
-        LocalDateTime startLDT = LocalDateTime.parse(startDecoded, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime endLDT = LocalDateTime.parse(endDecoded, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
+    @Override
+    public List<ViewStatsDto> getHits(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        if (start == null || end == null || start.isAfter(end)) {
+            throw new HitInputDataInvalidException("Start or End didn`t set, or start is before end.");
+        }
         List<ViewStatsDto> resultList;
         if (uris == null) {
-            resultList = hitRepository.getListEndpointHitsWOUri(startLDT, endLDT);
+            resultList = hitRepository.getListEndpointHitsWOUri(start, end);
         } else if (unique) {
-            resultList = hitRepository.getListEndpointHitsDistinctIp(uris, startLDT, endLDT);
+            resultList = hitRepository.getListEndpointHitsDistinctIp(uris, start, end);
         } else {
-            resultList = hitRepository.getListEndpointHits(uris, startLDT, endLDT);
+            resultList = hitRepository.getListEndpointHits(uris, start, end);
         }
         return resultList;
     }
 
     private void checkEndpointHitDto(EndpointHitDto dto) {
         if (dto.getApp().isBlank() || dto.getUri().isBlank() || dto.getIp().isBlank() || dto.getTimestamp() == null) {
-            throw new HitInputDataInvalidException("Проверьте аргументы для добавления статистики. Должны быть заполнены все поля.");
-        }
-    }
-
-    private void checkGetParams(String start, String end) {
-        if (start.isBlank() || end.isBlank()) {
-            throw new HitInputDataInvalidException("Проверьте аргументы для получения статистики. Должен быть задан период получения статистики");
+            throw new HitInputDataInvalidException("Check all fields. Fields have to be filled.");
         }
     }
 }

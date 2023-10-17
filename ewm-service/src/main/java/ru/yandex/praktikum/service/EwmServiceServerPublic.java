@@ -19,6 +19,7 @@ import ru.yandex.praktikum.model.dto.EventFullDto;
 import ru.yandex.praktikum.model.dto.EventShortDto;
 import ru.yandex.praktikum.model.status.EventStatus;
 import ru.yandex.praktikum.model.status.ParticipationRequestStatus;
+import ru.yandex.praktikum.model.status.SortStatus;
 import ru.yandex.praktikum.repository.CategoryRepository;
 import ru.yandex.praktikum.repository.EventRepository;
 import ru.yandex.praktikum.repository.RequestRepository;
@@ -26,8 +27,7 @@ import ru.yandex.praktikum.repository.RequestRepository;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,7 +65,7 @@ public class EwmServiceServerPublic {
 
     //GET /events
     //Получение событий с возможностью фильтрации
-    public List<EventShortDto> findEvents(String text, List<Integer> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest request) {
+    public List<EventShortDto> findEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortStatus sort, Integer from, Integer size, HttpServletRequest request) {
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
             throw new BadRequestException("Start must to be before end date");
         }
@@ -77,9 +77,62 @@ public class EwmServiceServerPublic {
                 .timestamp(LocalDateTime.now())
                 .build());
 
+        Pageable page = PageRequest.of(Math.abs(from / size), size);
 
+        if (categories != null && categories.size() == 1 && categories.get(0) == 0L) {
+            categories = null;
+        }
+        if (rangeStart == null) {
+            rangeStart = LocalDateTime.now();
+        }
+        if (rangeEnd == null) {
+            rangeEnd = LocalDateTime.MAX;
+        }
 
-        return null;
+        List<Event> events = eventRepository.findAllByPublic(text, categories, paid, rangeStart, rangeEnd, page);
+
+        if (onlyAvailable) {
+            events = getOnlyAvailableEvents(events);
+        }
+
+        List<String> eventUrls = events.stream()
+                .map(e -> "/events/" + e.getId())
+                .collect(Collectors.toList());
+
+        Map<String, Object> paramsForRequest = Map.of(
+                "start", LocalDateTime.MIN.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "end", LocalDateTime.MAX.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "uris", eventUrls,
+                "unique", true
+        );
+        List<ViewStatsDto> viewStatsDtos = statClient.getStats(paramsForRequest);
+
+        List<EventShortDto> eventShortDtos = events.stream()
+                .map(eventMapper::toEventShortDto)
+                .peek(eventShortDto -> {
+                    Optional<ViewStatsDto> viewStatsDto = viewStatsDtos.stream()
+                            .filter(statsDto -> statsDto.getUri().equals("/events/" + eventShortDto.getId()))
+                            .findFirst();
+                    eventShortDto.setViews(viewStatsDto.map(ViewStatsDto::getHits).orElse(0L));
+                }).peek(dto -> dto.setConfirmedRequests(
+                        requestRepository.countByEventIdAndStatus(dto.getId(), ParticipationRequestStatus.APPROVED)))
+                .collect(Collectors.toList());
+
+        switch (sort) {
+            case EVENT_DATE:
+                eventShortDtos.sort(Comparator.comparing(EventShortDto::getEventDate));
+                break;
+            case VIEWS:
+                eventShortDtos.sort(Comparator.comparing(EventShortDto::getViews).reversed());
+                break;
+        }
+
+        if (from >= eventShortDtos.size()) {
+            return Collections.emptyList();
+        }
+
+        int toIndex = Math.min(from + size, eventShortDtos.size());
+        return eventShortDtos.subList(from, toIndex);
     }
 
     //GET /events/{id}
@@ -112,6 +165,12 @@ public class EwmServiceServerPublic {
         result.setConfirmedRequests(numberOfConfirmedRequests);
         result.setViews(numberOfViews);
         return result;
+    }
+
+    private List<Event> getOnlyAvailableEvents(List<Event> srcList) {
+        return srcList.stream()
+                .filter(e -> e.getParticipantLimit().equals(0) || e.getParticipantLimit() < requestRepository.countByEventIdAndStatus(e.getId(), ParticipationRequestStatus.APPROVED))
+                .collect(Collectors.toList());
     }
 }
 

@@ -5,6 +5,7 @@ import org.mapstruct.factory.Mappers;
 import ru.yandex.praktikum.model.User;
 import ru.yandex.praktikum.model.dto.NewUserRequest;
 import ru.yandex.praktikum.model.dto.UserDto;
+import ru.yandex.praktikum.model.dto.UserShortDto;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -14,5 +15,5 @@ public interface UserMapper {
 
     UserDto toUserDto(User user);
 
-
+    UserShortDto toUserShortDto(User user);
 }

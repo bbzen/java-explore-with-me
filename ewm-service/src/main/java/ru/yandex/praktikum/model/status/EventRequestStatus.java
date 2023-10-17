@@ -1,4 +1,4 @@
-package ru.yandex.praktikum.model.dto;
+package ru.yandex.praktikum.model.status;
 
 public enum EventRequestStatus {
     CONFIRMED,

@@ -1,11 +1,17 @@
 package ru.yandex.praktikum.model.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.yandex.praktikum.model.status.ParticipationRequestStatus;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ParticipationRequestDto {
     private Long id;
     private LocalDateTime created;

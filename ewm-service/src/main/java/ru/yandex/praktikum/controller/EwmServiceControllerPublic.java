@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.praktikum.model.dto.CategoryDto;
 import ru.yandex.praktikum.model.dto.EventFullDto;
 import ru.yandex.praktikum.model.dto.EventShortDto;
+import ru.yandex.praktikum.model.status.SortStatus;
 import ru.yandex.praktikum.service.EwmServiceServerPublic;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,12 +39,12 @@ public class EwmServiceControllerPublic {
 
     @GetMapping("/events")
     public List<EventShortDto> findEvents(@RequestParam(defaultValue = "") String text,
-                                          @RequestParam(required = false) List<Integer> categories,
+                                          @RequestParam(required = false) List<Long> categories,
                                           @RequestParam(required = false) Boolean paid,
                                           @RequestParam @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
                                           @RequestParam @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
                                           @RequestParam(defaultValue = "false") Boolean onlyAvailable,
-                                          @RequestParam(defaultValue = "VIEWS") String sort,
+                                          @RequestParam(defaultValue = "VIEWS") SortStatus sort,
                                           @Valid @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                           @Valid @RequestParam(defaultValue = "10") @Min(1) Integer size,
                                           HttpServletRequest request) {

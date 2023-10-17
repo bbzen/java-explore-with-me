@@ -1,13 +1,19 @@
 package ru.yandex.praktikum.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.yandex.praktikum.model.Location;
 import ru.yandex.praktikum.model.status.EventStatus;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class EventFullDto {
     private Long id;
     private String annotation;

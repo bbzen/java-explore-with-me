@@ -28,6 +28,22 @@ public class EwmServiceControllerPrivate {
         return serverPrivate.createEvent(userId, dto);
     }
 
+    @GetMapping("/{userId}/requests")
+    public List<ParticipationRequestDto> findAllRequests(@PathVariable Long userId) {
+        return serverPrivate.findAllRequests(userId);
+    }
+
+    @PostMapping("/{userId}/requests")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ParticipationRequestDto createRequest(@PathVariable Long userId, @RequestParam Long eventId) {
+        return serverPrivate.createRequest(userId, eventId);
+    }
+
+    @PatchMapping("/{userId}/requests")
+    public ParticipationRequestDto updateRequest(@PathVariable Long userId, @PathVariable Long requestId) {
+        return serverPrivate.updateRequest(userId, requestId);
+    }
+
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto findUserEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         return serverPrivate.findUserEvent(userId, eventId);

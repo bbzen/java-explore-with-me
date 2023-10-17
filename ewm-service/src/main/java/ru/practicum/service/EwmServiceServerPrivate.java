@@ -3,6 +3,7 @@ package ru.practicum.service;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.exception.DataAccessException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.OnConflictException;
@@ -12,7 +13,7 @@ import ru.practicum.mapper.RequestMapper;
 import ru.practicum.model.*;
 import ru.practicum.model.dto.*;
 import ru.practicum.model.status.EventStatus;
-import ru.practicum.model.status.ParticipationRequestStatus;
+import ru.practicum.model.status.RequestStatus;
 import ru.practicum.model.status.StateAction;
 import ru.practicum.repository.*;
 
@@ -132,7 +133,7 @@ public class EwmServiceServerPrivate {
             throw new OnConflictException("There is no need in moderation.");
         }
 
-        Long confirmedRequestsNumber = requestRepository.countByEventIdAndStatus(eventId, ParticipationRequestStatus.APPROVED);
+        Long confirmedRequestsNumber = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.APPROVED);
 
         //compare participants number in repo with its limit
         if (currentEvent.getParticipantLimit() != 0 && currentEvent.getParticipantLimit() <= confirmedRequestsNumber) {
@@ -150,7 +151,7 @@ public class EwmServiceServerPrivate {
         List<ParticipationRequestDto> rejectedRequests =  new ArrayList<>();
 
         for (Request request : requests) {
-            if (!request.getStatus().equals(ParticipationRequestStatus.PENDING)) {
+            if (!request.getStatus().equals(RequestStatus.PENDING)) {
                 throw new OnConflictException("Unable to update request not in pending state.");
             }
             if (!request.getEvent().getId().equals(eventId)) {
@@ -160,23 +161,67 @@ public class EwmServiceServerPrivate {
             switch (dto.getStatus()) {
                 case CONFIRMED:
                     if (confirmedRequestsNumber < currentEvent.getParticipantLimit()) {
-                        request.setStatus(ParticipationRequestStatus.APPROVED);
+                        request.setStatus(RequestStatus.APPROVED);
                         confirmedRequestsNumber++;
                         confirmedRequests.add(requestMapper.toParticipationRequestDto(request));
                     } else {
-                        request.setStatus(ParticipationRequestStatus.REJECTED);
+                        request.setStatus(RequestStatus.REJECTED);
                         rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
                         throw new OnConflictException("Participants limit has been reached.");
                     }
                     break;
                 case REJECTED:
-                    request.setStatus(ParticipationRequestStatus.REJECTED);
+                    request.setStatus(RequestStatus.REJECTED);
                     rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
                     break;
             }
         }
 
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
+    }
+
+    public ParticipationRequestDto createRequest(Long userId, Long eventId) {
+        Event currentEvent = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found."));
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        if (currentEvent.getInitiator().getId() == userId) {
+            throw new OnConflictException("The initiator cant to participate in own event.");
+        }
+        if (!currentEvent.getState().equals(EventStatus.PUBLISHED)) {
+            throw new OnConflictException("Event is not published. Restricted to participate in it.");
+        }
+        if (currentEvent.getParticipantLimit() != 0) {
+            if (currentEvent.getParticipantLimit() <= requestRepository.countByEventIdAndStatus(eventId, RequestStatus.APPROVED)) {
+                throw new OnConflictException("The number of requests has reached the limit.");
+            }
+        }
+
+        Request request = new Request();
+        request.setCreated(LocalDateTime.now());
+        request.setEvent(currentEvent);
+        request.setRequester(currentUser);
+        request.setStatus(currentEvent.getRequestModeration() && !currentEvent.getParticipantLimit().equals(0) ? RequestStatus.PENDING : RequestStatus.APPROVED);
+        return requestMapper.toParticipationRequestDto(requestRepository.save(request));
+    }
+
+    public List<ParticipationRequestDto> findAllRequests(@PathVariable Long userId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        return requestRepository.findAllByRequesterId(userId).stream()
+                .map(requestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
+    }
+
+    public ParticipationRequestDto updateRequest(Long userId, Long requestId) {
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+
+        Request request = requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("There is no request with id " + requestId));
+        if (request.getRequester().getId() != userId) {
+            throw new DataAccessException("The user isn`t an initiator of the request. Restricted to update.");
+        }
+        if (request.getStatus().equals(RequestStatus.APPROVED)) {
+            throw new OnConflictException("Restricted to cancel confirmed requests.");
+        }
+        request.setStatus(RequestStatus.REJECTED);
+        return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     private void checkNewEventDto(DatedEvent dto) {
@@ -187,6 +232,7 @@ public class EwmServiceServerPrivate {
 
     //gets Location from repo if it exists, and saves if not.
     private Location getLocation(NewLocationDto dto) {
-        return locationRepository.findByLatAndLon(dto.getLat(), dto.getLon()).orElse(locationRepository.save(locationMapper.toLocation(dto)));
+        return locationRepository.findByLatAndLon(dto.getLat(), dto.getLon())
+                .orElse(locationRepository.save(locationMapper.toLocation(dto)));
     }
 }

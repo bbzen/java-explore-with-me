@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.model.status.ParticipationRequestStatus;
+import ru.practicum.model.status.RequestStatus;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,10 +19,11 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String created;
+    private LocalDateTime created;
     @ManyToOne
     private Event event;
     @ManyToOne
     private User requester;
-    private ParticipationRequestStatus status;
+    @Enumerated(EnumType.STRING)
+    private RequestStatus status;
 }

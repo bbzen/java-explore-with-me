@@ -18,7 +18,7 @@ import ru.practicum.model.dto.CategoryDto;
 import ru.practicum.model.dto.EventFullDto;
 import ru.practicum.model.dto.EventShortDto;
 import ru.practicum.model.status.EventStatus;
-import ru.practicum.model.status.ParticipationRequestStatus;
+import ru.practicum.model.status.RequestStatus;
 import ru.practicum.model.status.SortStatus;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
@@ -115,7 +115,7 @@ public class EwmServiceServerPublic {
                             .findFirst();
                     eventShortDto.setViews(viewStatsDto.map(ViewStatsDto::getHits).orElse(0L));
                 }).peek(dto -> dto.setConfirmedRequests(
-                        requestRepository.countByEventIdAndStatus(dto.getId(), ParticipationRequestStatus.APPROVED)))
+                        requestRepository.countByEventIdAndStatus(dto.getId(), RequestStatus.APPROVED)))
                 .collect(Collectors.toList());
 
         switch (sort) {
@@ -158,7 +158,7 @@ public class EwmServiceServerPublic {
                 "unique", true
         );
         List<ViewStatsDto> viewStatsDtos = statClient.getStats(paramsForRequest);
-        Long numberOfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventId, ParticipationRequestStatus.APPROVED);
+        Long numberOfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.APPROVED);
         Long numberOfViews = viewStatsDtos.isEmpty() ? 0L : viewStatsDtos.get(0).getHits();
 
         EventFullDto result = eventMapper.toEventFullDto(event);
@@ -169,7 +169,7 @@ public class EwmServiceServerPublic {
 
     private List<Event> getOnlyAvailableEvents(List<Event> srcList) {
         return srcList.stream()
-                .filter(e -> e.getParticipantLimit().equals(0) || e.getParticipantLimit() < requestRepository.countByEventIdAndStatus(e.getId(), ParticipationRequestStatus.APPROVED))
+                .filter(e -> e.getParticipantLimit().equals(0) || e.getParticipantLimit() < requestRepository.countByEventIdAndStatus(e.getId(), RequestStatus.APPROVED))
                 .collect(Collectors.toList());
     }
 }

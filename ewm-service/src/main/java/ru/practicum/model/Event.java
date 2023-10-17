@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.model.status.EventStatus;
+import ru.practicum.model.status.EventState;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -38,7 +38,7 @@ public class Event {
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
     @Enumerated(EnumType.STRING)
-    private EventStatus state;
+    private EventState state;
     private String title;
     private Long views;
 }

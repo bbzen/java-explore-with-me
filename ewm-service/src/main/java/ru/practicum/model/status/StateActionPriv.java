@@ -1,6 +1,6 @@
 package ru.practicum.model.status;
 
-public enum StateAction {
+public enum StateActionPriv {
     SEND_TO_REVIEW,
     CANCEL_REVIEW
 }

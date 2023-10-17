@@ -2,15 +2,16 @@ package ru.practicum.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.dto.CategoryDto;
-import ru.practicum.model.dto.NewCategoryDto;
-import ru.practicum.model.dto.NewUserRequest;
-import ru.practicum.model.dto.UserDto;
+import ru.practicum.model.dto.*;
+import ru.practicum.model.status.EventState;
 import ru.practicum.service.EwmServiceServerAdmin;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,15 +20,11 @@ import java.util.List;
 public class EwmServiceControllerAdmin {
     @Autowired
     private EwmServiceServerAdmin serviceServerAdmin;
+    private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam List<Long> ids, @RequestParam(required = false, defaultValue = "0") Integer from, @RequestParam(required = false, defaultValue = "10") Integer size) {
         return serviceServerAdmin.findUsers(ids, from, size);
-    }
-
-    @PatchMapping("/categories/{catId}")
-    public CategoryDto updateCategory(@RequestBody NewCategoryDto dto, @PathVariable Long catId) {
-        return serviceServerAdmin.updateCategory(dto, catId);
     }
 
     @PostMapping("/users")
@@ -36,21 +33,45 @@ public class EwmServiceControllerAdmin {
         return serviceServerAdmin.createUser(userRequest);
     }
 
-    @PostMapping("/categories")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto createCategory(@Valid @RequestBody NewCategoryDto categoryDto) {
-        return serviceServerAdmin.createCategory(categoryDto);
-    }
-
     @DeleteMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long userId) {
         serviceServerAdmin.deleteUser(userId);
     }
 
+    @PostMapping("/categories")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryDto createCategory(@Valid @RequestBody NewCategoryDto categoryDto) {
+        return serviceServerAdmin.createCategory(categoryDto);
+    }
+
     @DeleteMapping("/categories/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long catId) {
         serviceServerAdmin.deleteCategory(catId);
+    }
+
+    @PatchMapping("/categories/{catId}")
+    public CategoryDto updateCategory(@RequestBody NewCategoryDto dto, @PathVariable Long catId) {
+        return serviceServerAdmin.updateCategory(dto, catId);
+    }
+
+    @GetMapping("/events")
+    public List<EventFullDto> findAllEvents(@RequestParam(required = false) List<Long> users,
+                                            @RequestParam(required = false) List<EventState> states,
+                                            @RequestParam(required = false) List<Long> categories,
+                                            @RequestParam(required = false)
+                                            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
+                                            @RequestParam(required = false)
+                                            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
+                                            @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
+                                            @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
+        return serviceServerAdmin.findAllEvents(users, states, categories, rangeStart, rangeEnd, from, size);
+    }
+
+    @PatchMapping("/{eventId}")
+    public EventFullDto updateEvent(@PathVariable Long eventId,
+                                    @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
+        return serviceServerAdmin.updateEvent(eventId, updateEventAdminRequest);
     }
 }

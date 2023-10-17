@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.model.status.StateAction;
+import ru.practicum.model.status.StateActionAdm;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Size;
@@ -28,7 +28,7 @@ public class UpdateEventAdminRequest implements DatedEvent {
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
-    private StateAction stateAction;
+    private StateActionAdm stateActionAdm;
     @Size(min = 3, max = 120, message = "Title must be more than 3 and less tan 120 chars.")
     private String title;
 }

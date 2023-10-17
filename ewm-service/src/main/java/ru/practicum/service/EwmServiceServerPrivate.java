@@ -12,9 +12,9 @@ import ru.practicum.mapper.LocationMapper;
 import ru.practicum.mapper.RequestMapper;
 import ru.practicum.model.*;
 import ru.practicum.model.dto.*;
-import ru.practicum.model.status.EventStatus;
+import ru.practicum.model.status.EventState;
 import ru.practicum.model.status.RequestStatus;
-import ru.practicum.model.status.StateAction;
+import ru.practicum.model.status.StateActionPriv;
 import ru.practicum.repository.*;
 
 import java.time.LocalDateTime;
@@ -60,7 +60,7 @@ public class EwmServiceServerPrivate {
         result.setLocation(location);
         result.setCreatedOn(LocalDateTime.now());
         result.setInitiator(initiator);
-        result.setState(EventStatus.PENDING);
+        result.setState(EventState.PENDING);
         result.setViews(0L);
         result.setPaid(newEventDto.getPaid() != null && newEventDto.getPaid());
         result.setParticipantLimit(newEventDto.getParticipantLimit() == null ? 0 : newEventDto.getParticipantLimit());
@@ -90,7 +90,7 @@ public class EwmServiceServerPrivate {
         if (dto.getLocation() != null) {
             currentEvent.setLocation(getLocation(dto.getLocation()));
         }
-        if (currentEvent.getState() == EventStatus.PUBLISHED) {
+        if (currentEvent.getState() == EventState.PUBLISHED) {
             throw new OnConflictException("It`s allowed to change Events in pending or canceled status.");
         }
         if (dto.getCategory() != null) {
@@ -104,10 +104,10 @@ public class EwmServiceServerPrivate {
         Optional.ofNullable(dto.getParticipantLimit()).ifPresent(currentEvent::setParticipantLimit);
         Optional.ofNullable(dto.getRequestModeration()).ifPresent(currentEvent::setRequestModeration);
         Optional.ofNullable(dto.getTitle()).ifPresent(currentEvent::setTitle);
-        if (dto.getStateAction() == StateAction.SEND_TO_REVIEW) {
-            currentEvent.setState(EventStatus.PENDING);
-        } else if (dto.getStateAction() == StateAction.CANCEL_REVIEW) {
-            currentEvent.setState(EventStatus.CANCELED);
+        if (dto.getStateActionPriv() == StateActionPriv.SEND_TO_REVIEW) {
+            currentEvent.setState(EventState.PENDING);
+        } else if (dto.getStateActionPriv() == StateActionPriv.CANCEL_REVIEW) {
+            currentEvent.setState(EventState.CANCELED);
         }
         return eventMapper.toEventFullDto(currentEvent);
     }
@@ -186,7 +186,7 @@ public class EwmServiceServerPrivate {
         if (currentEvent.getInitiator().getId() == userId) {
             throw new OnConflictException("The initiator cant to participate in own event.");
         }
-        if (!currentEvent.getState().equals(EventStatus.PUBLISHED)) {
+        if (!currentEvent.getState().equals(EventState.PUBLISHED)) {
             throw new OnConflictException("Event is not published. Restricted to participate in it.");
         }
         if (currentEvent.getParticipantLimit() != 0) {

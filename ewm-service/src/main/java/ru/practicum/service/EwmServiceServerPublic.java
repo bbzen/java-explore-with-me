@@ -17,7 +17,7 @@ import ru.practicum.model.Event;
 import ru.practicum.model.dto.CategoryDto;
 import ru.practicum.model.dto.EventFullDto;
 import ru.practicum.model.dto.EventShortDto;
-import ru.practicum.model.status.EventStatus;
+import ru.practicum.model.status.EventState;
 import ru.practicum.model.status.RequestStatus;
 import ru.practicum.model.status.SortStatus;
 import ru.practicum.repository.CategoryRepository;
@@ -82,12 +82,8 @@ public class EwmServiceServerPublic {
         if (categories != null && categories.size() == 1 && categories.get(0) == 0L) {
             categories = null;
         }
-        if (rangeStart == null) {
-            rangeStart = LocalDateTime.now();
-        }
-        if (rangeEnd == null) {
-            rangeEnd = LocalDateTime.MAX;
-        }
+        rangeStart = rangeStart == null ? LocalDateTime.now() : rangeStart;
+        rangeEnd = rangeEnd == null ? LocalDateTime.MAX : rangeEnd;
 
         List<Event> events = eventRepository.findAllByPublic(text, categories, paid, rangeStart, rangeEnd, page);
 
@@ -100,8 +96,8 @@ public class EwmServiceServerPublic {
                 .collect(Collectors.toList());
 
         Map<String, Object> paramsForRequest = Map.of(
-                "start", LocalDateTime.MIN.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
-                "end", LocalDateTime.MAX.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "start", rangeStart.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "end", rangeEnd.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
                 "uris", eventUrls,
                 "unique", true
         );
@@ -139,9 +135,9 @@ public class EwmServiceServerPublic {
     //Получение подробной информации об опубликованном событии по его идентификатору
     public EventFullDto findEventById(Long eventId, HttpServletRequest request) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event " + eventId + " not found."));
+                .orElseThrow(() -> new NotFoundException("Event " + eventId + " was not found."));
 
-        if (!event.getState().equals(EventStatus.PUBLISHED)) {
+        if (!event.getState().equals(EventState.PUBLISHED)) {
             throw new NotFoundException("Event " + eventId + " was not published.");
         }
         statClient.postHit(EndpointHitDto.builder()

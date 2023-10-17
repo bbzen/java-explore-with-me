@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.model.Location;
-import ru.practicum.model.status.EventStatus;
+import ru.practicum.model.status.EventState;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +31,7 @@ public class EventFullDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
-    private EventStatus state;
+    private EventState state;
     private String title;
     private Long views;
 }

@@ -121,7 +121,7 @@ public class EwmServiceServerAdmin {
             int size) {
         Pageable page = PageRequest.of(Math.abs(from / size), size);
         rangeStart = rangeStart == null ? LocalDateTime.now() : rangeStart;
-        rangeEnd = rangeEnd == null ? LocalDateTime.MAX : rangeEnd;
+        rangeEnd = rangeEnd == null ? LocalDateTime.now().plusYears(1) : rangeEnd;
 
         List<Event> events = eventRepository.findAllByAdmin(users, states, categories, rangeStart, rangeEnd, page);
 
@@ -173,7 +173,7 @@ public class EwmServiceServerAdmin {
         Optional.ofNullable(adminRequest.getPaid()).ifPresent(event::setPaid);
         Optional.ofNullable(adminRequest.getRequestModeration()).ifPresent(event::setRequestModeration);
 
-        switch (adminRequest.getStateActionAdm()) {
+        switch (adminRequest.getStateAction()) {
             case PUBLISH_EVENT:
                 event.setState(EventState.PUBLISHED);
                 event.setPublishedOn(LocalDateTime.now());
@@ -230,10 +230,10 @@ public class EwmServiceServerAdmin {
     }
 
     private void checkRequestState(UpdateEventAdminRequest adminRequest, Event event) {
-        if (adminRequest.getStateActionAdm() != null) {
-            if (adminRequest.getStateActionAdm().equals(StateActionAdm.PUBLISH_EVENT) && !event.getState().equals(EventState.PENDING)) {
+        if (adminRequest.getStateAction() != null) {
+            if (adminRequest.getStateAction().equals(StateActionAdm.PUBLISH_EVENT) && !event.getState().equals(EventState.PENDING)) {
                 throw new OnConflictException("Bad state of admin action. Restricted to publish");
-            } else if (adminRequest.getStateActionAdm().equals(StateActionAdm.REJECT_EVENT) && event.getState().equals(EventState.PUBLISHED)) {
+            } else if (adminRequest.getStateAction().equals(StateActionAdm.REJECT_EVENT) && event.getState().equals(EventState.PUBLISHED)) {
                 throw new OnConflictException("Bad state of admin action. Restricted to reject");
             }
         }

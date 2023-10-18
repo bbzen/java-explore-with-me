@@ -36,3 +36,5 @@ build/
 /db/shareitdb.mv.db
 /db/ewmmsdb.mv.db
 /db/ewmmsdb.trace.db
+/db/ewmstatsdb.mv.db
+/db/ewmstatsdb.trace.db

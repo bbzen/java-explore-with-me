@@ -2,6 +2,8 @@ package ru.practicum.ewm.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.ewm.exception.DataAccessException;
@@ -43,8 +45,9 @@ public class EwmServiceServerPrivate {
 
     //GET /users/{userId}/events
     // Получение событий, добавленных текущим пользователем
-    public List<EventFullDto> findAllUserEvents(Long userId) {
-        return eventRepository.findAllByInitiator(userId).stream().map(eventMapper::toEventFullDto).collect(Collectors.toList());
+    public List<EventShortDto> findAllUserEvents(Long userId, int from, int size) {
+        Pageable page = PageRequest.of(Math.abs(from / size), size);
+        return eventRepository.findAllByInitiatorId(userId, page).stream().map(eventMapper::toEventShortDto).collect(Collectors.toList());
     }
 
     //POST /users/{userId}/events
@@ -58,8 +61,6 @@ public class EwmServiceServerPrivate {
         Location location = getLocation(newEventDto.getLocation());
         Event result = eventMapper.toEventFromNew(newEventDto, category, location);
 
-        result.setCategory(category);
-        result.setLocation(location);
         result.setCreatedOn(LocalDateTime.now());
         result.setInitiator(initiator);
         result.setState(EventState.PENDING);

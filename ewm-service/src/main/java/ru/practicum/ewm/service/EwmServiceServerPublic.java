@@ -101,7 +101,7 @@ public class EwmServiceServerPublic {
             categories = null;
         }
         rangeStart = rangeStart == null ? LocalDateTime.now() : rangeStart;
-        rangeEnd = rangeEnd == null ? LocalDateTime.MAX : rangeEnd;
+        rangeEnd = rangeEnd == null ? LocalDateTime.now().plusYears(1) : rangeEnd;
 
         List<Event> events = eventRepository.findAllByPublic(text, categories, paid, rangeStart, rangeEnd, page);
 
@@ -166,8 +166,8 @@ public class EwmServiceServerPublic {
                 .build());
 
         Map<String, Object> paramsForRequest = Map.of(
-                "start", LocalDateTime.MIN.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
-                "end", LocalDateTime.MAX.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "start", LocalDateTime.now().minusYears(1).format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "end", LocalDateTime.now().plusYears(1) .format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
                 "uris", List.of("/events/" + event.getId()),
                 "unique", true
         );

@@ -64,16 +64,15 @@ public class EwmServiceControllerAdmin {
             @RequestParam(required = false) List<Long> users,
             @RequestParam(required = false) List<EventState> states,
             @RequestParam(required = false) List<Long> categories,
-            @RequestParam(required = false)
-            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
-            @RequestParam(required = false)
-            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
             @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
             @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
         return serviceServerAdmin.findAllEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
-    @PatchMapping("/{eventId}")
+    //
+    @PatchMapping("/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long eventId,
                                     @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
         return serviceServerAdmin.updateEvent(eventId, updateEventAdminRequest);

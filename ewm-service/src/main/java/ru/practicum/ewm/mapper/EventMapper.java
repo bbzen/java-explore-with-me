@@ -15,6 +15,7 @@ public interface EventMapper {
     EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "eventDate", source = "dto.eventDate")
     @Mapping(target = "category", source = "category")
     @Mapping(target = "location", source = "location")
     Event toEventFromNew(NewEventDto dto, Category category, Location location);

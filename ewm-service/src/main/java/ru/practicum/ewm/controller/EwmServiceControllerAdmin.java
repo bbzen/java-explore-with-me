@@ -23,7 +23,10 @@ public class EwmServiceControllerAdmin {
     private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping("/users")
-    public List<UserDto> getUsers(@RequestParam List<Long> ids, @RequestParam(required = false, defaultValue = "0") Integer from, @RequestParam(required = false, defaultValue = "10") Integer size) {
+    public List<UserDto> getUsers(
+            @RequestParam List<Long> ids,
+            @RequestParam(required = false, defaultValue = "0") Integer from,
+            @RequestParam(required = false, defaultValue = "10") Integer size) {
         return serviceServerAdmin.findUsers(ids, from, size);
     }
 
@@ -52,20 +55,21 @@ public class EwmServiceControllerAdmin {
     }
 
     @PatchMapping("/categories/{catId}")
-    public CategoryDto updateCategory(@RequestBody NewCategoryDto dto, @PathVariable Long catId) {
+    public CategoryDto updateCategory(@RequestBody CategoryDto dto, @PathVariable Long catId) {
         return serviceServerAdmin.updateCategory(dto, catId);
     }
 
     @GetMapping("/events")
-    public List<EventFullDto> findAllEvents(@RequestParam(required = false) List<Long> users,
-                                            @RequestParam(required = false) List<EventState> states,
-                                            @RequestParam(required = false) List<Long> categories,
-                                            @RequestParam(required = false)
-                                            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
-                                            @RequestParam(required = false)
-                                            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
-                                            @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
-                                            @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
+    public List<EventFullDto> findAllEvents(
+            @RequestParam(required = false) List<Long> users,
+            @RequestParam(required = false) List<EventState> states,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false)
+            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
+            @RequestParam(required = false)
+            @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
+            @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
+            @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
         return serviceServerAdmin.findAllEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
@@ -73,5 +77,24 @@ public class EwmServiceControllerAdmin {
     public EventFullDto updateEvent(@PathVariable Long eventId,
                                     @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
         return serviceServerAdmin.updateEvent(eventId, updateEventAdminRequest);
+    }
+
+    @PostMapping("/compilations")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CompilationDto createCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) {
+        return serviceServerAdmin.createCompilation(newCompilationDto);
+    }
+
+    @PatchMapping("/compilations/{compId}")
+    public CompilationDto updateCompilation(
+            @PathVariable Long compId,
+            @Valid @RequestBody UpdateCompilationRequest compilationRequest) {
+        return serviceServerAdmin.updateCompilation(compId, compilationRequest);
+    }
+
+    @DeleteMapping("/compilations/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompilation(@PathVariable Long compId) {
+        serviceServerAdmin.deleteCompilation(compId);
     }
 }

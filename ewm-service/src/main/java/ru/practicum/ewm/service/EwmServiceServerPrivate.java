@@ -51,8 +51,10 @@ public class EwmServiceServerPrivate {
     // Добавление нового события
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         checkNewEventDto(newEventDto);
-        User initiator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
-        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() -> new NotFoundException("There is no category with id " + newEventDto.getCategory()));
+        User initiator = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
+        Category category = categoryRepository.findById(newEventDto.getCategory())
+                .orElseThrow(() -> new NotFoundException("There is no category with id " + newEventDto.getCategory()));
         Location location = getLocation(newEventDto.getLocation());
         Event result = eventMapper.toEventFromNew(newEventDto, category, location);
 
@@ -71,7 +73,8 @@ public class EwmServiceServerPrivate {
     // GET /users/{userId}/events/{eventId}
     // Получение полной информации о событии добавленном текущим пользователем
     public EventFullDto findUserEvent(Long userId, Long eventId) {
-        Event result = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event" + eventId + "not found."));
+        Event result = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event" + eventId + "not found."));
         if (result.getInitiator().getId() != userId) {
             throw new DataAccessException("The user isn`t an initiator of the Event. Restricted to edit.");
         }
@@ -82,8 +85,10 @@ public class EwmServiceServerPrivate {
     //Изменение события добавленного текущим пользователем
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest dto) {
         checkNewEventDto(dto);
-        Event currentEvent = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found."));
-        User currentUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        Event currentEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found."));
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
         if (currentEvent.getInitiator().getId() != currentUser.getId()) {
             throw new DataAccessException("The user isn`t an initiator of the Event. Restricted to update.");
         }
@@ -116,15 +121,17 @@ public class EwmServiceServerPrivate {
     //Получение информации о запросах на участие в событии текущего пользователя
     public List<ParticipationRequestDto> findAllParticipationRequests(Long userId, Long eventId) {
         eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found."));
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
         return requestRepository.findAllByEventId(eventId).stream().map(requestMapper::toParticipationRequestDto).collect(Collectors.toList());
     }
 
     //PATCH /users/{userId}/events/{eventId}/requests
     //Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя
     public EventRequestStatusUpdateResult updateParticipationRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest dto) {
-        Event currentEvent = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found."));
-        User currentUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        Event currentEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found."));
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
         if (currentEvent.getInitiator().getId() != currentUser.getId()) {
             throw new DataAccessException("The user isn`t an initiator of the Event. Restricted to update.");
         }
@@ -148,7 +155,7 @@ public class EwmServiceServerPrivate {
         }
 
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
-        List<ParticipationRequestDto> rejectedRequests =  new ArrayList<>();
+        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 
         for (Request request : requests) {
             if (!request.getStatus().equals(RequestStatus.PENDING)) {
@@ -181,8 +188,10 @@ public class EwmServiceServerPrivate {
     }
 
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
-        Event currentEvent = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found."));
-        User currentUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        Event currentEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found."));
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
         if (currentEvent.getInitiator().getId() == userId) {
             throw new OnConflictException("The initiator cant to participate in own event.");
         }
@@ -194,24 +203,25 @@ public class EwmServiceServerPrivate {
                 throw new OnConflictException("The number of requests has reached the limit.");
             }
         }
+        RequestStatus currentStatus = currentEvent.getRequestModeration() && !currentEvent.getParticipantLimit().equals(0) ? RequestStatus.PENDING : RequestStatus.APPROVED;
 
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
         request.setEvent(currentEvent);
         request.setRequester(currentUser);
-        request.setStatus(currentEvent.getRequestModeration() && !currentEvent.getParticipantLimit().equals(0) ? RequestStatus.PENDING : RequestStatus.APPROVED);
+        request.setStatus(currentStatus);
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     public List<ParticipationRequestDto> findAllRequests(@PathVariable Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
         return requestRepository.findAllByRequesterId(userId).stream()
                 .map(requestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
     }
 
     public ParticipationRequestDto updateRequest(Long userId, Long requestId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId ));
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
 
         Request request = requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("There is no request with id " + requestId));
         if (request.getRequester().getId() != userId) {

@@ -7,14 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.OnConflictException;
-import ru.practicum.ewm.mapper.CategoryMapper;
-import ru.practicum.ewm.mapper.EventMapper;
-import ru.practicum.ewm.mapper.LocationMapper;
-import ru.practicum.ewm.mapper.UserMapper;
-import ru.practicum.ewm.model.Category;
-import ru.practicum.ewm.model.Event;
-import ru.practicum.ewm.model.Location;
-import ru.practicum.ewm.model.User;
+import ru.practicum.ewm.mapper.*;
+import ru.practicum.ewm.model.*;
 import ru.practicum.ewm.model.dto.*;
 import ru.practicum.ewm.model.status.EventState;
 import ru.practicum.ewm.model.status.RequestStatus;
@@ -25,6 +19,7 @@ import ru.practicum.stat.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +35,9 @@ public class EwmServiceServerAdmin {
     @Autowired
     private final LocationRepository locationRepository;
     @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
+    @Autowired
+    private final CompilationRepository compilationRepository;
     @Autowired
     private final UserMapper userMapper;
     @Autowired
@@ -49,6 +46,8 @@ public class EwmServiceServerAdmin {
     private final LocationMapper locationMapper;
     @Autowired
     private final EventMapper eventMapper;
+    @Autowired
+    private final CompilationMapper compilationMapper;
     @Autowired
     private final StatClient statClient;
     private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -92,7 +91,7 @@ public class EwmServiceServerAdmin {
 
     //PATCH /admin/categories/{catId}
     //Изменение категории
-    public CategoryDto updateCategory(NewCategoryDto dto, Long catId) {
+    public CategoryDto updateCategory(CategoryDto dto, Long catId) {
         if (!categoryRepository.existsById(catId)) {
             throw new NotFoundException("Category " + catId + " not found.");
         }
@@ -112,7 +111,14 @@ public class EwmServiceServerAdmin {
 
     //GET /admin/events
     //Поиск событий
-    public List<EventFullDto> findAllEvents(List<Long> users, List<EventState> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
+    public List<EventFullDto> findAllEvents(
+            List<Long> users,
+            List<EventState> states,
+            List<Long> categories,
+            LocalDateTime rangeStart,
+            LocalDateTime rangeEnd,
+            int from,
+            int size) {
         Pageable page = PageRequest.of(Math.abs(from / size), size);
         rangeStart = rangeStart == null ? LocalDateTime.now() : rangeStart;
         rangeEnd = rangeEnd == null ? LocalDateTime.MAX : rangeEnd;
@@ -178,6 +184,38 @@ public class EwmServiceServerAdmin {
 
         }
         return eventMapper.toEventFullDto(eventRepository.save(event));
+    }
+
+    //POST /admin/compilations
+    //Добавление новой подборки
+    public CompilationDto createCompilation(NewCompilationDto dto) {
+        boolean checkInitialState = dto.getEvents() != null && !dto.getEvents().isEmpty();
+        List<Event> events = checkInitialState ? eventRepository.findAllById(dto.getEvents()) : new ArrayList<>();
+        if (dto.getPinned() == null) {
+            dto.setPinned(false);
+        }
+
+        return compilationMapper.toCompilationDto(compilationRepository.save(compilationMapper.toCompilation(dto, events)));
+    }
+
+    //DELETE /admin/compilations/{compId}
+    //Удаление подборки
+    public void deleteCompilation(Long compId) {
+        compilationRepository.findById(compId).orElseThrow(() -> new NotFoundException("Compilation " + compId + " was not found."));
+        compilationRepository.deleteById(compId);
+    }
+
+    public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest compilationRequest) {
+        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new NotFoundException("Compilation " + compId + " was not found."));
+
+        if (compilationRequest.getEvents() != null) {
+            compilation.setEvents(eventRepository.findAllById(compilationRequest.getEvents()));
+        }
+
+        Optional.ofNullable(compilationRequest.getTitle()).ifPresent(compilation::setTitle);
+        Optional.ofNullable(compilationRequest.getPinned()).ifPresent(compilation::setPinned);
+
+        return compilationMapper.toCompilationDto(compilation);
     }
 
     private Location getLocation(NewLocationDto dto) {

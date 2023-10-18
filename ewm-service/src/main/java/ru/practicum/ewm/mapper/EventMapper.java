@@ -15,12 +15,8 @@ public interface EventMapper {
     EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "confirmedRequests", ignore = true)
-    @Mapping(target = "createdOn", ignore = true)
-    @Mapping(target = "initiator", ignore = true)
-    @Mapping(target = "publishedOn", ignore = true)
-    @Mapping(target = "state", ignore = true)
-    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "category", source = "category")
+    @Mapping(target = "location", source = "location")
     Event toEventFromNew(NewEventDto dto, Category category, Location location);
 
     EventFullDto toEventFullDto(Event event);

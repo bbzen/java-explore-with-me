@@ -50,17 +50,25 @@ public class EwmServiceControllerPrivate {
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
-    public EventFullDto updateEvent(@PathVariable Long userId, @PathVariable Long eventId, @Valid @RequestBody UpdateEventUserRequest dto) {
+    public EventFullDto updateEvent(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @Valid @RequestBody UpdateEventUserRequest dto) {
         return serverPrivate.updateEvent(userId, eventId, dto);
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
-    public List<ParticipationRequestDto> findAllParticipationRequests(@PathVariable Long userId, @PathVariable Long eventId) {
+    public List<ParticipationRequestDto> findAllParticipationRequests(
+            @PathVariable Long userId,
+            @PathVariable Long eventId) {
         return serverPrivate.findAllParticipationRequests(userId, eventId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/requests")
-    public EventRequestStatusUpdateResult updateParticipationRequest(@PathVariable Long userId, @PathVariable Long eventId, @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
+    public EventRequestStatusUpdateResult updateParticipationRequest(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
         return serverPrivate.updateParticipationRequest(userId, eventId, dto);
     }
 }

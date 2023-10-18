@@ -9,15 +9,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.CategoryMapper;
+import ru.practicum.ewm.mapper.CompilationMapper;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.dto.CategoryDto;
+import ru.practicum.ewm.model.dto.CompilationDto;
 import ru.practicum.ewm.model.dto.EventFullDto;
 import ru.practicum.ewm.model.dto.EventShortDto;
 import ru.practicum.ewm.model.status.EventState;
 import ru.practicum.ewm.model.status.RequestStatus;
 import ru.practicum.ewm.model.status.SortStatus;
 import ru.practicum.ewm.repository.CategoryRepository;
+import ru.practicum.ewm.repository.CompilationRepository;
 import ru.practicum.ewm.repository.EventRepository;
 import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.stat.client.StatClient;
@@ -40,9 +43,13 @@ public class EwmServiceServerPublic {
     @Autowired
     private final RequestRepository requestRepository;
     @Autowired
+    private final CompilationRepository compilationRepository;
+    @Autowired
     private final CategoryMapper categoryMapper;
     @Autowired
     private final EventMapper eventMapper;
+    @Autowired
+    private final CompilationMapper compilationMapper;
     @Autowired
     private final StatClient statClient;
     private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -60,12 +67,23 @@ public class EwmServiceServerPublic {
     //GET /categories/{catId}
     //Получение информации о категории по её идентификатору
     public CategoryDto findCategory(@PathVariable Long catId) {
-        return categoryMapper.toCategoryDto(categoryRepository.findById(catId).orElseThrow(() -> new NotFoundException("There is no such category with id " + catId)));
+        return categoryMapper.toCategoryDto(categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("There is no such category with id " + catId)));
     }
 
     //GET /events
     //Получение событий с возможностью фильтрации
-    public List<EventShortDto> findEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, SortStatus sort, Integer from, Integer size, HttpServletRequest request) {
+    public List<EventShortDto> findEvents(
+            String text,
+            List<Long> categories,
+            Boolean paid,
+            LocalDateTime rangeStart,
+            LocalDateTime rangeEnd,
+            Boolean onlyAvailable,
+            SortStatus sort,
+            Integer from,
+            Integer size,
+            HttpServletRequest request) {
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
             throw new BadRequestException("Start must to be before end date");
         }
@@ -161,6 +179,22 @@ public class EwmServiceServerPublic {
         result.setConfirmedRequests(numberOfConfirmedRequests);
         result.setViews(numberOfViews);
         return result;
+    }
+
+    //GET compilations
+    //Получение подборки событий
+    public List<CompilationDto> findAllCompilations(Boolean pinned, int from, int size) {
+        Pageable page = PageRequest.of(Math.abs(from / size), size);
+        return compilationRepository.findAllByPinnedIsNullOrPinned(pinned, page).stream()
+                .map(compilationMapper::toCompilationDto)
+                .collect(Collectors.toList());
+    }
+
+    //Get /compilations/{compId}
+    //Получение подборки событий по его Id
+    public CompilationDto findCompilationById(Long compId) {
+        return compilationMapper.toCompilationDto(compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation " + compId + " was not found.")));
     }
 
     private List<Event> getOnlyAvailableEvents(List<Event> srcList) {

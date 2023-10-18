@@ -12,16 +12,9 @@ public interface CategoryMapper {
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
     @Mapping(target = "id", ignore = true)
+    Category toCategory(CategoryDto dto);
+
     Category toCategory(NewCategoryDto dto);
 
     CategoryDto toCategoryDto(Category cat);
-
-    default Category toCategory(Long category) {
-        if (category == null) {
-            return null;
-        }
-        Category result = new Category();
-        result.setId(category);
-        return result;
-    }
 }

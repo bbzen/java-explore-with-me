@@ -231,7 +231,7 @@ public class EwmServiceServerAdmin {
         Optional.ofNullable(compilationRequest.getTitle()).ifPresent(compilation::setTitle);
         Optional.ofNullable(compilationRequest.getPinned()).ifPresent(compilation::setPinned);
 
-        return compilationMapper.toCompilationDto(compilation);
+        return compilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
     private Location getLocation(NewLocationDto dto) {

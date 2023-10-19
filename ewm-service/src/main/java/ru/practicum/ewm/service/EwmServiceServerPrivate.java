@@ -66,7 +66,6 @@ public class EwmServiceServerPrivate {
         result.setCreatedOn(LocalDateTime.now());
         result.setInitiator(initiator);
         result.setState(EventState.PENDING);
-        result.setViews(0L);
         result.setPaid(newEventDto.getPaid() != null && newEventDto.getPaid());
         result.setParticipantLimit(newEventDto.getParticipantLimit() == null ? 0 : newEventDto.getParticipantLimit());
         result.setRequestModeration(newEventDto.getRequestModeration() == null || newEventDto.getRequestModeration());

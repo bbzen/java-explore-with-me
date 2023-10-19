@@ -42,9 +42,9 @@ public class EwmServiceControllerPrivate {
         return serverPrivate.createRequest(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/requests")
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto updateRequest(@PathVariable Long userId, @PathVariable Long requestId) {
-        return serverPrivate.updateRequest(userId, requestId);
+        return serverPrivate.updateRequestToCanceled(userId, requestId);
     }
 
     @GetMapping("/{userId}/events/{eventId}")

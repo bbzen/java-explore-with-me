@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class NewEventDto implements DatedEvent {
     @Size(min = 20, message = "Event description must be more than 20 char.")
     @Size(max = 7000, message = "Event description must be less than 7000 char.")
     private String description;
+    @Future(message = "Event must be in future and in two hours before present moment.")
     @NotNull(message = "Event date cant be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;

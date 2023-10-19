@@ -174,13 +174,13 @@ public class EwmServiceServerPrivate {
                         confirmedRequestsNumber++;
                         confirmedRequests.add(requestMapper.toParticipationRequestDto(request));
                     } else {
-                        request.setStatus(RequestStatus.REJECTED);
+                        request.setStatus(RequestStatus.CANCELED);
                         rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
                         throw new OnConflictException("Participants limit has been reached.");
                     }
                     break;
                 case REJECTED:
-                    request.setStatus(RequestStatus.REJECTED);
+                    request.setStatus(RequestStatus.CANCELED);
                     rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
                     break;
             }
@@ -222,7 +222,7 @@ public class EwmServiceServerPrivate {
                 .collect(Collectors.toList());
     }
 
-    public ParticipationRequestDto updateRequest(Long userId, Long requestId) {
+    public ParticipationRequestDto updateRequestToCanceled(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
 
         Request request = requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("There is no request with id " + requestId));
@@ -232,7 +232,7 @@ public class EwmServiceServerPrivate {
         if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
             throw new OnConflictException("Restricted to cancel confirmed requests.");
         }
-        request.setStatus(RequestStatus.REJECTED);
+        request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 

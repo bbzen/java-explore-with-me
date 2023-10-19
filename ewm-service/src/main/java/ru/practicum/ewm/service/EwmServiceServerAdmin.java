@@ -106,7 +106,11 @@ public class EwmServiceServerAdmin {
         }
         Category catToSave = categoryMapper.toCategory(dto);
         catToSave.setId(catId);
-        return categoryMapper.toCategoryDto(categoryRepository.save(catToSave));
+        try {
+            return categoryMapper.toCategoryDto(categoryRepository.save(catToSave));
+        } catch (Exception e) {
+            throw new OnConflictException("During category saving exception been thrown: " + e.getMessage());
+        }
     }
 
     //DELETE /admin/categories/{catId}

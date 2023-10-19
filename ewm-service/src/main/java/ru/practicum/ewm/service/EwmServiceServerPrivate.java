@@ -174,13 +174,13 @@ public class EwmServiceServerPrivate {
                         confirmedRequestsNumber++;
                         confirmedRequests.add(requestMapper.toParticipationRequestDto(request));
                     } else {
-                        request.setStatus(RequestStatus.CANCELED);
+                        request.setStatus(RequestStatus.REJECTED);
                         rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
                         throw new OnConflictException("Participants limit has been reached.");
                     }
                     break;
                 case REJECTED:
-                    request.setStatus(RequestStatus.CANCELED);
+                    request.setStatus(RequestStatus.REJECTED);
                     rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
                     break;
             }
@@ -238,7 +238,7 @@ public class EwmServiceServerPrivate {
         if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
             throw new OnConflictException("Restricted to cancel confirmed requests.");
         }
-        request.setStatus(RequestStatus.CANCELED);
+        request.setStatus(RequestStatus.REJECTED);
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 

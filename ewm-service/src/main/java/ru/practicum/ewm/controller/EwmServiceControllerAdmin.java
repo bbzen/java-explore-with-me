@@ -55,7 +55,7 @@ public class EwmServiceControllerAdmin {
     }
 
     @PatchMapping("/categories/{catId}")
-    public CategoryDto updateCategory(@RequestBody CategoryDto dto, @PathVariable Long catId) {
+    public CategoryDto updateCategory(@Valid @RequestBody CategoryDto dto, @PathVariable Long catId) {
         return serviceServerAdmin.updateCategory(dto, catId);
     }
 
@@ -71,7 +71,6 @@ public class EwmServiceControllerAdmin {
         return serviceServerAdmin.findAllEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
-    //
     @PatchMapping("/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long eventId,
                                     @Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {

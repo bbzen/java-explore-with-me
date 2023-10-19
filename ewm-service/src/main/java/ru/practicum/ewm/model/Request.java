@@ -21,8 +21,10 @@ public class Request {
     private Long id;
     private LocalDateTime created;
     @ManyToOne
+    @JoinColumn(name = "event", nullable = false)
     private Event event;
     @ManyToOne
+    @JoinColumn(name = "requester", nullable = false)
     private User requester;
     @Enumerated(EnumType.STRING)
     private RequestStatus status;

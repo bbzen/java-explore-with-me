@@ -121,6 +121,7 @@ public class EwmServiceServerPublic {
         );
         List<ViewStatsDto> viewStatsDtos = statClient.getStats(paramsForRequest);
 
+
         List<EventShortDto> eventShortDtos = events.stream()
                 .map(eventMapper::toEventShortDto)
                 .peek(eventShortDto -> {

@@ -224,7 +224,7 @@ public class EwmServiceServerAdmin {
     }
 
     private void checkDateTimeUEAR(UpdateEventAdminRequest updateEventAdminRequest) {
-        if (updateEventAdminRequest.getEventDate() == null || LocalDateTime.now().plusHours(1).isAfter(updateEventAdminRequest.getEventDate())) {
+        if (updateEventAdminRequest.getEventDate() != null && LocalDateTime.now().plusHours(1).isAfter(updateEventAdminRequest.getEventDate())) {
             throw new OnConflictException("The event time and date cant be set in an hour before event.");
         }
     }

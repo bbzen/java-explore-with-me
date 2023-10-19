@@ -59,8 +59,10 @@ public class EwmServiceServerPrivate {
         Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new NotFoundException("There is no category with id " + newEventDto.getCategory()));
         Location location = getLocation(newEventDto.getLocation());
-        Event result = eventMapper.toEventFromNew(newEventDto, category, location);
+        Event result = eventMapper.toEventFromNew(newEventDto);
 
+        result.setLocation(location);
+        result.setCategory(category);
         result.setCreatedOn(LocalDateTime.now());
         result.setInitiator(initiator);
         result.setState(EventState.PENDING);

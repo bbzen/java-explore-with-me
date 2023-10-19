@@ -68,4 +68,15 @@ public class ErrorHandler {
         apiError.setMessage(e.getLocalizedMessage());
         return apiError;
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleInternalServerErrorException(final Exception e) {
+        ApiError apiError = new ApiError();
+
+        apiError.setReason("Internal ewm server error.");
+        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        apiError.setMessage(e.getLocalizedMessage());
+        return apiError;
+    }
 }

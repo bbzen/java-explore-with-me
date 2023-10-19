@@ -70,7 +70,12 @@ public class EwmServiceServerAdmin {
     //POST /admin/users
     //Добавление нового пользователя
     public UserDto createUser(NewUserRequest userRequest) {
-        return userMapper.toUserDto(userRepository.save(userMapper.toUser(userRequest)));
+        try {
+            return userMapper.toUserDto(userRepository.save(userMapper.toUser(userRequest)));
+        } catch (Exception e) {
+            throw new OnConflictException("During user saving exception been thrown: " + e.getMessage());
+
+        }
     }
 
     //DELETE /admin/users/{userId}
@@ -89,9 +94,8 @@ public class EwmServiceServerAdmin {
         try {
             return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(dto)));
         } catch (Exception e ) {
-            throw new OnConflictException("During saving exception been thrown: " + e.getMessage());
+            throw new OnConflictException("During category saving exception been thrown: " + e.getMessage());
         }
-
     }
 
     //PATCH /admin/categories/{catId}

@@ -189,11 +189,15 @@ public class EwmServiceServerPrivate {
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
 
+    //POST /users/{userId}/requests
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
         Event currentEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found."));
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
+        if (requestRepository.findByEventIdAndRequesterId(eventId, userId).isPresent()) {
+            throw new OnConflictException("Given user already participates in event.");
+        }
         if (currentEvent.getInitiator().getId() == userId) {
             throw new OnConflictException("The initiator cant to participate in own event.");
         }
@@ -215,6 +219,7 @@ public class EwmServiceServerPrivate {
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
+    //GET /users/{userId}/requests
     public List<ParticipationRequestDto> findAllRequests(@PathVariable Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
         return requestRepository.findAllByRequesterId(userId).stream()
@@ -222,6 +227,7 @@ public class EwmServiceServerPrivate {
                 .collect(Collectors.toList());
     }
 
+    //PATCH /users/{userId}/requests/{requestId}/cancel
     public ParticipationRequestDto updateRequestToCanceled(Long userId, Long requestId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
 

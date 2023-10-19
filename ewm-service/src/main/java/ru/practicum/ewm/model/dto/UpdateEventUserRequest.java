@@ -28,7 +28,7 @@ public class UpdateEventUserRequest implements DatedEvent {
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
-    private StateActionPriv stateActionPriv;
+    private StateActionPriv stateAction;
     @Size(min = 3, max = 120, message = "Title must be more than 3 and less tan 120 chars.")
     private String title;
 }

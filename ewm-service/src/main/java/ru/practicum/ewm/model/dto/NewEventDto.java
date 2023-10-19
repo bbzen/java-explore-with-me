@@ -19,11 +19,13 @@ public class NewEventDto implements DatedEvent {
     @Size(min = 20, message = "Event annotation must be more than 20 char.")
     @Size(max = 2000, message = "Event annotation must be less than 2000 char.")
     private String annotation;
+    @NotNull(message = "Category cant be null")
     private Long category;
     @NotNull(message = "Invalid event description.")
     @Size(min = 20, message = "Event description must be more than 20 char.")
     @Size(max = 7000, message = "Event description must be less than 7000 char.")
     private String description;
+    @NotNull(message = "Event date cant be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     private NewLocationDto location;

@@ -137,16 +137,19 @@ public class EwmServiceServerAdmin {
         );
         List<ViewStatsDto> viewStatsDtos = statClient.getStats(paramsForRequest);
 
-        return events.stream()
-                .map(eventMapper::toEventFullDto)
-                .peek(eventFullDto -> {
-                    Optional<ViewStatsDto> viewStatsDto = viewStatsDtos.stream()
-                            .filter(statsDto -> statsDto.getUri().equals("/events/" + eventFullDto.getId()))
-                            .findFirst();
-                    eventFullDto.setViews(viewStatsDto.map(ViewStatsDto::getHits).orElse(0L));
-                }).peek(eventFullDto -> eventFullDto.setConfirmedRequests(
-                        requestRepository.countByEventIdAndStatus(eventFullDto.getId(), RequestStatus.APPROVED)))
-                .collect(Collectors.toList());
+        List<EventFullDto> list = new ArrayList<>();
+        for (Event event : events) {
+            EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
+            Optional<ViewStatsDto> viewStatsDto = viewStatsDtos.stream()
+                    .filter(statsDto -> statsDto.getUri().equals("/events/" + eventFullDto.getId()))
+                    .findFirst();
+            eventFullDto.setViews(viewStatsDto.map(ViewStatsDto::getHits).orElse(0L));
+
+            Long numberIfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventFullDto.getId(), RequestStatus.APPROVED);
+            eventFullDto.setConfirmedRequests(numberIfConfirmedRequests);
+            list.add(eventFullDto);
+        }
+        return list;
     }
 
     //PATCH /admin/events/{eventId}

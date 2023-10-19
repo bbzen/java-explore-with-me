@@ -112,9 +112,10 @@ public class EwmServiceServerPrivate {
         Optional.ofNullable(dto.getParticipantLimit()).ifPresent(currentEvent::setParticipantLimit);
         Optional.ofNullable(dto.getRequestModeration()).ifPresent(currentEvent::setRequestModeration);
         Optional.ofNullable(dto.getTitle()).ifPresent(currentEvent::setTitle);
-        if (dto.getStateActionPriv() == StateActionPriv.SEND_TO_REVIEW) {
+
+        if (dto.getStateAction() == StateActionPriv.SEND_TO_REVIEW) {
             currentEvent.setState(EventState.PENDING);
-        } else if (dto.getStateActionPriv() == StateActionPriv.CANCEL_REVIEW) {
+        } else if (dto.getStateAction() == StateActionPriv.CANCEL_REVIEW) {
             currentEvent.setState(EventState.CANCELED);
         }
         return eventMapper.toEventFullDto(currentEvent);
@@ -145,12 +146,10 @@ public class EwmServiceServerPrivate {
 
         Long confirmedRequestsNumber = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.APPROVED);
 
-        //compare participants number in repo with its limit
         if (currentEvent.getParticipantLimit() != 0 && currentEvent.getParticipantLimit() <= confirmedRequestsNumber) {
             throw new OnConflictException("The number of participants got the limit.");
         }
 
-        //get list of requests by ids from dto and compare them with each other
         List<Request> requests = requestRepository.findAllByIdIn(dto.getRequestIds());
         Set<Long> actualIds = requests.stream().map(Request::getId).collect(Collectors.toSet());
         if (!actualIds.containsAll(new HashSet<>(dto.getRequestIds()))) {
@@ -238,7 +237,7 @@ public class EwmServiceServerPrivate {
     }
 
     private void checkNewEventDto(DatedEvent dto) {
-        if (LocalDateTime.now().plusHours(2).isAfter(dto.getEventDate())) {
+        if (dto.getEventDate() != null && LocalDateTime.now().plusHours(2).isAfter(dto.getEventDate())) {
             throw new OnConflictException("Event time can`t be in two hours before beginning.");
         }
     }

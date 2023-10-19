@@ -123,7 +123,7 @@ public class EwmServiceServerPrivate {
 
     //GET /users/{userId}/events/{eventId}/requests
     //Получение информации о запросах на участие в событии текущего пользователя
-    public List<ParticipationRequestDto> findAllParticipationRequests(Long userId, Long eventId) {
+    public List<ParticipationRequestDto> findAllRequests(Long userId, Long eventId) {
         eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found."));
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
         return requestRepository.findAllByEventId(eventId).stream().map(requestMapper::toParticipationRequestDto).collect(Collectors.toList());
@@ -131,7 +131,7 @@ public class EwmServiceServerPrivate {
 
     //PATCH /users/{userId}/events/{eventId}/requests
     //Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя
-    public EventRequestStatusUpdateResult updateParticipationRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest dto) {
+    public EventRequestStatusUpdateResult updateRequest(Long userId, Long eventId, EventRequestStatusUpdateRequest dto) {
         Event currentEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found."));
         User currentUser = userRepository.findById(userId)
@@ -174,8 +174,6 @@ public class EwmServiceServerPrivate {
                         confirmedRequestsNumber++;
                         confirmedRequests.add(requestMapper.toParticipationRequestDto(request));
                     } else {
-                        request.setStatus(RequestStatus.REJECTED);
-                        rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
                         throw new OnConflictException("Participants limit has been reached.");
                     }
                     break;
@@ -185,7 +183,7 @@ public class EwmServiceServerPrivate {
                     break;
             }
         }
-
+        requestRepository.saveAll(requests);
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
 
@@ -238,7 +236,7 @@ public class EwmServiceServerPrivate {
         if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
             throw new OnConflictException("Restricted to cancel confirmed requests.");
         }
-        request.setStatus(RequestStatus.REJECTED);
+        request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 

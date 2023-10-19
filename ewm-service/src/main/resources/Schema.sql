@@ -33,7 +33,6 @@ published_on timestamp WITHOUT TIME ZONE,
 request_moderation Boolean DEFAULT TRUE,
 state varchar(31) NOT NULL,
 title varchar(120) NOT NULL,
-views BIGINT,
 CONSTRAINT fk_category FOREIGN KEY(category) REFERENCES categories(id),
 CONSTRAINT fk_initiator FOREIGN KEY(initiator) REFERENCES users(id) ON UPDATE RESTRICT ON DELETE CASCADE,
 CONSTRAINT fk_location FOREIGN KEY(location) REFERENCES locations(id) ON UPDATE RESTRICT ON DELETE CASCADE

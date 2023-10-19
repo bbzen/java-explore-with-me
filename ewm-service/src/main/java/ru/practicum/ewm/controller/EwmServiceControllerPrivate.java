@@ -25,10 +25,23 @@ public class EwmServiceControllerPrivate {
         return serverPrivate.findAllUserEvents(userId, from, size);
     }
 
+    @GetMapping("/{userId}/events/{eventId}")
+    public EventFullDto findUserEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+        return serverPrivate.findUserEvent(userId, eventId);
+    }
+
     @PostMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable Long userId, @Valid @RequestBody NewEventDto dto) {
         return serverPrivate.createEvent(userId, dto);
+    }
+
+    @PatchMapping("/{userId}/events/{eventId}")
+    public EventFullDto updateEvent(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @Valid @RequestBody UpdateEventUserRequest dto) {
+        return serverPrivate.updateEvent(userId, eventId, dto);
     }
 
     @GetMapping("/{userId}/requests")
@@ -42,29 +55,11 @@ public class EwmServiceControllerPrivate {
         return serverPrivate.createRequest(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/requests/{requestId}/cancel")
-    public ParticipationRequestDto updateRequest(@PathVariable Long userId, @PathVariable Long requestId) {
-        return serverPrivate.updateRequestToCanceled(userId, requestId);
-    }
-
-    @GetMapping("/{userId}/events/{eventId}")
-    public EventFullDto findUserEvent(@PathVariable Long userId, @PathVariable Long eventId) {
-        return serverPrivate.findUserEvent(userId, eventId);
-    }
-
-    @PatchMapping("/{userId}/events/{eventId}")
-    public EventFullDto updateEvent(
-            @PathVariable Long userId,
-            @PathVariable Long eventId,
-            @Valid @RequestBody UpdateEventUserRequest dto) {
-        return serverPrivate.updateEvent(userId, eventId, dto);
-    }
-
     @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> findAllParticipationRequests(
             @PathVariable Long userId,
             @PathVariable Long eventId) {
-        return serverPrivate.findAllParticipationRequests(userId, eventId);
+        return serverPrivate.findAllRequests(userId, eventId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/requests")
@@ -72,6 +67,11 @@ public class EwmServiceControllerPrivate {
             @PathVariable Long userId,
             @PathVariable Long eventId,
             @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
-        return serverPrivate.updateParticipationRequest(userId, eventId, dto);
+        return serverPrivate.updateRequest(userId, eventId, dto);
+    }
+
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
+    public ParticipationRequestDto updateRequest(@PathVariable Long userId, @PathVariable Long requestId) {
+        return serverPrivate.updateRequestToCanceled(userId, requestId);
     }
 }

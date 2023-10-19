@@ -37,7 +37,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "and (:states is null or e.state in :states) " +
             "and (:categories is null or e.category.id in :categories) " +
             "and (e.eventDate between :rangeStart and :rangeEnd))")
-    List<Event> findAllByAdmin(@Param("users") List<Long> users, @Param("states")List<EventState> states,
-                               @Param("categories") List<Long> categories, @Param("rangeStart") LocalDateTime rangeStart,
+    List<Event> findAllByAdmin(@Param("users") List<Long> users,
+                               @Param("states")List<EventState> states,
+                               @Param("categories") List<Long> categories,
+                               @Param("rangeStart") LocalDateTime rangeStart,
                                @Param("rangeEnd") LocalDateTime rangeEnd, Pageable pageable);
 }

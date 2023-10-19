@@ -144,7 +144,7 @@ public class EwmServiceServerPrivate {
             throw new OnConflictException("There is no need in moderation.");
         }
 
-        Long confirmedRequestsNumber = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.APPROVED);
+        Long confirmedRequestsNumber = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
 
         if (currentEvent.getParticipantLimit() != 0 && currentEvent.getParticipantLimit() <= confirmedRequestsNumber) {
             throw new OnConflictException("The number of participants got the limit.");
@@ -170,7 +170,7 @@ public class EwmServiceServerPrivate {
             switch (dto.getStatus()) {
                 case CONFIRMED:
                     if (confirmedRequestsNumber < currentEvent.getParticipantLimit()) {
-                        request.setStatus(RequestStatus.APPROVED);
+                        request.setStatus(RequestStatus.CONFIRMED);
                         confirmedRequestsNumber++;
                         confirmedRequests.add(requestMapper.toParticipationRequestDto(request));
                     } else {
@@ -201,11 +201,11 @@ public class EwmServiceServerPrivate {
             throw new OnConflictException("Event is not published. Restricted to participate in it.");
         }
         if (currentEvent.getParticipantLimit() != 0) {
-            if (currentEvent.getParticipantLimit() <= requestRepository.countByEventIdAndStatus(eventId, RequestStatus.APPROVED)) {
+            if (currentEvent.getParticipantLimit() <= requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED)) {
                 throw new OnConflictException("The number of requests has reached the limit.");
             }
         }
-        RequestStatus currentStatus = currentEvent.getRequestModeration() && !currentEvent.getParticipantLimit().equals(0) ? RequestStatus.PENDING : RequestStatus.APPROVED;
+        RequestStatus currentStatus = currentEvent.getRequestModeration() && !currentEvent.getParticipantLimit().equals(0) ? RequestStatus.PENDING : RequestStatus.CONFIRMED;
 
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
@@ -229,7 +229,7 @@ public class EwmServiceServerPrivate {
         if (request.getRequester().getId() != userId) {
             throw new DataAccessException("The user isn`t an initiator of the request. Restricted to update.");
         }
-        if (request.getStatus().equals(RequestStatus.APPROVED)) {
+        if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
             throw new OnConflictException("Restricted to cancel confirmed requests.");
         }
         request.setStatus(RequestStatus.REJECTED);

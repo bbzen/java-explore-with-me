@@ -145,7 +145,7 @@ public class EwmServiceServerAdmin {
                     .findFirst();
             eventFullDto.setViews(viewStatsDto.map(ViewStatsDto::getHits).orElse(0L));
 
-            Long numberIfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventFullDto.getId(), RequestStatus.APPROVED);
+            Long numberIfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventFullDto.getId(), RequestStatus.CONFIRMED);
             eventFullDto.setConfirmedRequests(numberIfConfirmedRequests);
             list.add(eventFullDto);
         }

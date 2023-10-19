@@ -45,7 +45,6 @@ created timestamp WITHOUT TIME ZONE,
 event BIGINT REFERENCES events(id),
 requester BIGINT REFERENCES users(id),
 status varchar(31) NOT NULL,
-confirmed boolean NOT NULL,
 CONSTRAINT unw_user_request UNIQUE(event, requester)
 );
 

@@ -89,7 +89,7 @@ public class EwmServiceServerPublic {
         }
 
         statClient.postHit(EndpointHitDto.builder()
-                .app("ewm")
+                .app("ewm-main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
@@ -160,7 +160,7 @@ public class EwmServiceServerPublic {
             throw new NotFoundException("Event " + eventId + " was not published.");
         }
         statClient.postHit(EndpointHitDto.builder()
-                .app("ewm")
+                .app("ewm-main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())

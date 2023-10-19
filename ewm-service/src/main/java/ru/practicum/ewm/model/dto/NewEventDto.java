@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -16,13 +17,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewEventDto implements DatedEvent {
-    @NotNull(message = "Invalid event annotation.")
+    @NotBlank(message = "Invalid event annotation.")
     @Size(min = 20, message = "Event annotation must be more than 20 char.")
     @Size(max = 2000, message = "Event annotation must be less than 2000 char.")
     private String annotation;
     @NotNull(message = "Category cant be null")
     private Long category;
-    @NotNull(message = "Invalid event description.")
+    @NotBlank(message = "Invalid event description.")
     @Size(min = 20, message = "Event description must be more than 20 char.")
     @Size(max = 7000, message = "Event description must be less than 7000 char.")
     private String description;
@@ -34,7 +35,7 @@ public class NewEventDto implements DatedEvent {
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
-    @NotNull(message = "Invalid event description.")
+    @NotBlank(message = "Invalid event description.")
     @Size(min = 3, message = "Event description must be more than 20 char.")
     @Size(max = 120, message = "Event description must be less than 7000 char.")
     private String title;

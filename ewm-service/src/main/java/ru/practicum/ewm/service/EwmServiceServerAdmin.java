@@ -86,7 +86,12 @@ public class EwmServiceServerAdmin {
     //POST /admin/categories
     //Добавление новой категории
     public CategoryDto createCategory(NewCategoryDto dto) {
-        return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(dto)));
+        try {
+            return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(dto)));
+        } catch (Exception e ) {
+            throw new OnConflictException("During saving exception been thrown: " + e.getMessage());
+        }
+
     }
 
     //PATCH /admin/categories/{catId}
@@ -175,16 +180,16 @@ public class EwmServiceServerAdmin {
         Optional.ofNullable(adminRequest.getParticipantLimit()).ifPresent(event::setParticipantLimit);
         Optional.ofNullable(adminRequest.getPaid()).ifPresent(event::setPaid);
         Optional.ofNullable(adminRequest.getRequestModeration()).ifPresent(event::setRequestModeration);
-
-        switch (adminRequest.getStateAction()) {
-            case PUBLISH_EVENT:
-                event.setState(EventState.PUBLISHED);
-                event.setPublishedOn(LocalDateTime.now());
-                break;
-            case REJECT_EVENT:
-                event.setState(EventState.CANCELED);
-                break;
-
+        if (adminRequest.getStateAction() != null) {
+            switch (adminRequest.getStateAction()) {
+                case PUBLISH_EVENT:
+                    event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
+                    break;
+                case REJECT_EVENT:
+                    event.setState(EventState.CANCELED);
+                    break;
+            }
         }
         return eventMapper.toEventFullDto(eventRepository.save(event));
     }

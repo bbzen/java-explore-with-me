@@ -166,6 +166,8 @@ public class EwmServiceServerPublic {
                 .timestamp(LocalDateTime.now())
                 .build());
 
+        Long numberOfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
+
         Map<String, Object> paramsForRequest = Map.of(
                 "start", LocalDateTime.now().minusYears(1).format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
                 "end", LocalDateTime.now().plusYears(1) .format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
@@ -173,7 +175,6 @@ public class EwmServiceServerPublic {
                 "unique", true
         );
         List<ViewStatsDto> viewStatsDtos = statClient.getStats(paramsForRequest);
-        Long numberOfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
         Long numberOfViews = viewStatsDtos.isEmpty() ? 0L : viewStatsDtos.get(0).getHits();
 
         EventFullDto result = eventMapper.toEventFullDto(event);

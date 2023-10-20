@@ -119,6 +119,9 @@ public class EwmServiceServerAdmin {
         if (!categoryRepository.existsById(catId)) {
             throw new NotFoundException("Category " + catId + " not found.");
         }
+        if (eventRepository.findAllByCategoryId(catId).size() != 0) {
+            throw new OnConflictException("Prohibited to delete a category used in existing events.");
+        }
         categoryRepository.deleteById(catId);
     }
 

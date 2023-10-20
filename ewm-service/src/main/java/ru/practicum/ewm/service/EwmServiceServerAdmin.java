@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class EwmServiceServerAdmin {
+    private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
     @Autowired
     private final UserRepository userRepository;
     @Autowired
@@ -50,7 +51,6 @@ public class EwmServiceServerAdmin {
     private final CompilationMapper compilationMapper;
     @Autowired
     private final StatClient statClient;
-    private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
     @Autowired
     private RequestRepository requestRepository;
 
@@ -93,7 +93,7 @@ public class EwmServiceServerAdmin {
     public CategoryDto createCategory(NewCategoryDto dto) {
         try {
             return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(dto)));
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new OnConflictException("During category saving exception been thrown: " + e.getMessage());
         }
     }
@@ -146,8 +146,8 @@ public class EwmServiceServerAdmin {
                 .collect(Collectors.toList());
 
         Map<String, Object> paramsForRequest = Map.of(
-                "start", rangeStart.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
-                "end", rangeEnd.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "start", rangeStart.format(DateTimeFormatter.ofPattern(dateTimePattern)),
+                "end", rangeEnd.format(DateTimeFormatter.ofPattern(dateTimePattern)),
                 "uris", eventUrls,
                 "unique", true
         );

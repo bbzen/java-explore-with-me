@@ -52,7 +52,7 @@ public class EwmServiceServerPublic {
     private final CompilationMapper compilationMapper;
     @Autowired
     private final StatClient statClient;
-    private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
+    private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
 
     //GET /categories
     //Получение категорий
@@ -114,8 +114,8 @@ public class EwmServiceServerPublic {
                 .collect(Collectors.toList());
 
         Map<String, Object> paramsForRequest = Map.of(
-                "start", rangeStart.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
-                "end", rangeEnd.format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "start", rangeStart.format(DateTimeFormatter.ofPattern(dateTimePattern)),
+                "end", rangeEnd.format(DateTimeFormatter.ofPattern(dateTimePattern)),
                 "uris", eventUrls,
                 "unique", true
         );
@@ -169,8 +169,8 @@ public class EwmServiceServerPublic {
         Long numberOfConfirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
 
         Map<String, Object> paramsForRequest = Map.of(
-                "start", LocalDateTime.now().minusYears(1).format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
-                "end", LocalDateTime.now().plusYears(1) .format(DateTimeFormatter.ofPattern(DATETIMEPATTERN)),
+                "start", LocalDateTime.now().minusYears(1).format(DateTimeFormatter.ofPattern(dateTimePattern)),
+                "end", LocalDateTime.now().plusYears(1).format(DateTimeFormatter.ofPattern(dateTimePattern)),
                 "uris", List.of("/events/" + event.getId()),
                 "unique", true
         );

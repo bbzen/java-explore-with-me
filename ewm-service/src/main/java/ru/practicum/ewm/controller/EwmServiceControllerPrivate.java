@@ -20,8 +20,8 @@ public class EwmServiceControllerPrivate {
 
     @GetMapping("/{userId}/events")
     public List<EventShortDto> findAllUserEvents(@PathVariable Long userId,
-                                                @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
+                                                 @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                 @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
         return serverPrivate.findAllUserEvents(userId, from, size);
     }
 

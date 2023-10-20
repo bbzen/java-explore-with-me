@@ -24,7 +24,6 @@ public class StatServerController {
         hitService.create(dto);
     }
 
-    //todo redo with LocalDateTime
     @GetMapping("/stats")
     public List<ViewStatsDto> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,

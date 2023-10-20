@@ -25,7 +25,7 @@ import java.util.List;
 public class EwmServiceControllerPublic {
     @Autowired
     private EwmServiceServerPublic servicePublic;
-    private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
+    private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
 
 
     @GetMapping("/categories")
@@ -45,8 +45,8 @@ public class EwmServiceControllerPublic {
             @RequestParam(defaultValue = "") String text,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,
-            @RequestParam(required = false) @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
-            @RequestParam(required = false) @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat(pattern = dateTimePattern) LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(pattern = dateTimePattern) LocalDateTime rangeEnd,
             @RequestParam(defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(defaultValue = "VIEWS") SortStatus sort,
             @Valid @RequestParam(defaultValue = "0") @Min(0) Integer from,

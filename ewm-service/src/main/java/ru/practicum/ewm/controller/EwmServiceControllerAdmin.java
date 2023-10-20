@@ -20,7 +20,7 @@ import java.util.List;
 public class EwmServiceControllerAdmin {
     @Autowired
     private EwmServiceServerAdmin serviceServerAdmin;
-    private final static String DATETIMEPATTERN = "yyyy-MM-dd HH:mm:ss";
+    private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping("/users")
     public List<UserDto> getUsers(
@@ -64,8 +64,8 @@ public class EwmServiceControllerAdmin {
             @RequestParam(required = false) List<Long> users,
             @RequestParam(required = false) List<EventState> states,
             @RequestParam(required = false) List<Long> categories,
-            @RequestParam(required = false) @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeStart,
-            @RequestParam(required = false) @DateTimeFormat(pattern = DATETIMEPATTERN) LocalDateTime rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat(pattern = dateTimePattern) LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(pattern = dateTimePattern) LocalDateTime rangeEnd,
             @Valid @RequestParam(defaultValue = "0") @Min(0) int from,
             @Valid @RequestParam(defaultValue = "10") @Min(1) int size) {
         return serviceServerAdmin.findAllEvents(users, states, categories, rangeStart, rangeEnd, from, size);

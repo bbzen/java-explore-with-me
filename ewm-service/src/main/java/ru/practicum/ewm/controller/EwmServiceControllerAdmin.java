@@ -24,7 +24,7 @@ public class EwmServiceControllerAdmin {
 
     @GetMapping("/users")
     public List<UserDto> getUsers(
-            @RequestParam List<Long> ids,
+            @RequestParam(required = false) List<Long> ids,
             @RequestParam(required = false, defaultValue = "0") Integer from,
             @RequestParam(required = false, defaultValue = "10") Integer size) {
         return serviceServerAdmin.findUsers(ids, from, size);

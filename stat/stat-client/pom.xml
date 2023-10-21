@@ -9,8 +9,6 @@
 
     <artifactId>stat-client</artifactId>
 
-    <name>stat-client</name>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

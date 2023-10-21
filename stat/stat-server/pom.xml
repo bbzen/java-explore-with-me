@@ -8,9 +8,6 @@
     </parent>
 
     <artifactId>stat-server</artifactId>
-    <packaging>jar</packaging>
-
-    <name>stat-server</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

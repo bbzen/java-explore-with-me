@@ -7,10 +7,15 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>explore-with-me-stat</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>stat</artifactId>
+    <packaging>pom</packaging>
 
-    <name>explore-with-me-stat</name>
+    <modules>
+        <module>stat-client</module>
+        <module>stat-dto</module>
+        <module>stat-server</module>
+    </modules>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

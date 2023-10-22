@@ -1,11 +1,13 @@
 version: '3.1'
 services:
   stats-server:
-    build: stat/stat-server
+    build: ./stat/stat-server
     image: stat-server-image
     container_name: stat-server-cont
     ports:
       - "9090:9090"
+      - "9092:9092"
+
     volumes:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
@@ -14,8 +16,8 @@ services:
     environment:
       - SPRING_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statdb
-      - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=pass
+      - SPRING_DATASOURCE_USERNAME=gagaran
+      - SPRING_DATASOURCE_PASSWORD=1234
 
   stats-db:
     image: postgres:14-alpine
@@ -27,14 +29,37 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
     environment:
       - POSTGRES_DB=statdb
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=pass
+      - POSTGRES_USER=gagaran
+      - POSTGRES_PASSWORD=1234
 
   ewm-service:
-    build: ewm-service
-    image: ewm-service_image
+    build: ./ewm-service
+    image: ewm-service-image
+    container_name: ewm-service-cont
     ports:
       - "8080:8080"
+      - "8082:8082"
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    depends_on:
+      - ewm-db
+    environment:
+      - STAT_SERVER_URL=http://stats-server:9090
+      - SPRING_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewmdb
+      - SPRING_DATASOURCE_USERNAME=gagaran
+      - SPRING_DATASOURCE_PASSWORD=1234
 
   ewm-db:
     image: postgres:14-alpine
+    container_name: ewm-db-cont
+    ports:
+      - "6540:5432"
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      - POSTGRES_DB=ewmdb
+      - POSTGRES_USER=gagaran
+      - POSTGRES_PASSWORD=1234

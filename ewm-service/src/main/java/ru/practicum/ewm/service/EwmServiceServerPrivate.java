@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.ewm.exception.DataAccessException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.OnConflictException;
+import ru.practicum.ewm.mapper.CommentMapper;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.mapper.LocationMapper;
 import ru.practicum.ewm.mapper.RequestMapper;
@@ -37,11 +38,15 @@ public class EwmServiceServerPrivate {
     @Autowired
     private final RequestRepository requestRepository;
     @Autowired
+    private final CommentRepository commentRepository;
+    @Autowired
     private final EventMapper eventMapper;
     @Autowired
     private final LocationMapper locationMapper;
     @Autowired
     private final RequestMapper requestMapper;
+    @Autowired
+    private final CommentMapper commentMapper;
 
     //GET /users/{userId}/events
     // Получение событий, добавленных текущим пользователем
@@ -237,6 +242,61 @@ public class EwmServiceServerPrivate {
         }
         request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toParticipationRequestDto(requestRepository.save(request));
+    }
+
+    //GET /{userId}/comments/{commentId}
+    public CommentDto findUserComment(Long userId, Long commentId) {
+        Comment comment = commentRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Comment" + commentId + "not found."));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User" + userId + "not found."));
+
+        if (comment.getAuthor().getId() != userId) {
+            throw new DataAccessException("The user isn`t an author of the comment. Restricted to find.");
+        }
+        return commentMapper.toCommentDto(comment);
+    }
+
+    //POST /{userId}/comments
+    public CommentDto createComment(Long userId, Long eventId, NewCommentDto dto) {
+        User author = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("There is no user with such id: " + userId));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("There is no event with id " + eventId));
+
+        Comment result = commentMapper.toComment(dto);
+        result.setAuthor(author);
+        result.setEvent(event);
+        return commentMapper.toCommentDto(commentRepository.save(result));
+    }
+
+    //PATCH /{userId}/comments/{commentId}
+    public CommentDto updateComment(Long userId, Long commentId, UpdateCommentDto dto) {
+        Comment comment = commentRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Comment" + commentId + "not found."));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User" + userId + "not found."));
+
+        if (comment.getAuthor().getId() != userId) {
+            throw new DataAccessException("The user isn`t an author of the comment. Restricted to find.");
+        }
+        if (dto.getText() != null) {
+            comment.setText(dto.getText());
+        }
+        return commentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    //DELETE /{userId}/comments/{commentId}
+    public void deleteComment(Long userId, Long commentId) {
+        Comment comment = commentRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Comment" + commentId + "not found."));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User" + userId + "not found."));
+
+        if (comment.getAuthor().getId() != userId) {
+            throw new DataAccessException("The user isn`t an author of the comment. Restricted to find.");
+        }
+        commentRepository.deleteById(commentId);
     }
 
     private void checkNewEventDto(DatedEvent dto) {

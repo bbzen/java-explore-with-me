@@ -1,8 +1,6 @@
 package ru.practicum.ewm.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,8 +8,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "comments", schema = "public")
 public class Comment {
@@ -27,4 +23,16 @@ public class Comment {
     private Event event;
     private String text;
     private LocalDateTime timestamp;
+
+    public Comment() {
+        this.timestamp = LocalDateTime.now();
+    }
+
+    public Comment(Long id, User author, Event event, String text) {
+        this.id = id;
+        this.author = author;
+        this.event = event;
+        this.text = text;
+        this.timestamp = LocalDateTime.now();
+    }
 }

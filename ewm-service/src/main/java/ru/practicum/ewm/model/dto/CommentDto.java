@@ -1,11 +1,13 @@
 package ru.practicum.ewm.model.dto;
 
-import ru.practicum.ewm.model.User;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 public class CommentDto {
-    private User author;
+    private Long id;
+    private UserShortDto author;
     private String text;
     private LocalDateTime timestamp;
 }

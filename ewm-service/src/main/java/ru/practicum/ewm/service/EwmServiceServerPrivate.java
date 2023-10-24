@@ -246,7 +246,7 @@ public class EwmServiceServerPrivate {
 
     //GET /{userId}/comments/{commentId}
     public CommentDto findUserComment(Long userId, Long commentId) {
-        Comment comment = commentRepository.findById(userId)
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment" + commentId + "not found."));
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User" + userId + "not found."));
@@ -272,7 +272,7 @@ public class EwmServiceServerPrivate {
 
     //PATCH /{userId}/comments/{commentId}
     public CommentDto updateComment(Long userId, Long commentId, UpdateCommentDto dto) {
-        Comment comment = commentRepository.findById(userId)
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment" + commentId + "not found."));
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User" + userId + "not found."));
@@ -288,7 +288,7 @@ public class EwmServiceServerPrivate {
 
     //DELETE /{userId}/comments/{commentId}
     public void deleteComment(Long userId, Long commentId) {
-        Comment comment = commentRepository.findById(userId)
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment" + commentId + "not found."));
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User" + userId + "not found."));

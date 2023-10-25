@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.ewm.exception.BadRequestException;
+import ru.practicum.ewm.exception.DataAccessException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.OnConflictException;
 import ru.practicum.ewm.model.ApiError;
@@ -65,6 +66,17 @@ public class ErrorHandler {
 
         apiError.setReason("Entity somehow was not found.");
         apiError.setStatus(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(e.getLocalizedMessage());
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleInvalidParamsException(final DataAccessException e) {
+        ApiError apiError = new ApiError();
+
+        apiError.setReason("Restricted access to data.");
+        apiError.setStatus(HttpStatus.FORBIDDEN);
         apiError.setMessage(e.getLocalizedMessage());
         return apiError;
     }

@@ -74,4 +74,29 @@ public class EwmServiceControllerPrivate {
     public ParticipationRequestDto updateRequest(@PathVariable Long userId, @PathVariable Long requestId) {
         return serverPrivate.updateRequestToCanceled(userId, requestId);
     }
+
+    @GetMapping("/{userId}/comments/{commentId}")
+    public CommentDto findUserComment(@PathVariable Long userId, @PathVariable Long commentId) {
+        return serverPrivate.findUserComment(userId, commentId);
+    }
+
+    @PostMapping("/{userId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto createComment(@PathVariable Long userId, @RequestParam Long eventId, @Valid @RequestBody NewCommentDto dto) {
+        return serverPrivate.createComment(userId, eventId, dto);
+    }
+
+    @PatchMapping("/{userId}/comments/{commentId}")
+    public CommentDto updateComment(
+            @PathVariable Long userId,
+            @PathVariable Long commentId,
+            @Valid @RequestBody UpdateCommentDto dto) {
+        return serverPrivate.updateComment(userId, commentId, dto);
+    }
+
+    @DeleteMapping("/{userId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable Long userId, @PathVariable Long commentId) {
+        serverPrivate.deleteComment(userId, commentId);
+    }
 }
